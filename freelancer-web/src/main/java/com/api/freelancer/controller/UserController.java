@@ -43,6 +43,11 @@ public class UserController implements UserApi {
     }
 
     private Users mapToUsers(UserDto userDto) {
-        return new Users(userDto.userName(), userDto.firstName(),userDto.lastName(),userDto.email());
+        return Users.builder()
+                .userName(userDto.userName())
+                .firstName(userDto.firstName())
+                .lastName(userDto.lastName())
+                .email(userDto.email())
+                .build();
     }
 }
