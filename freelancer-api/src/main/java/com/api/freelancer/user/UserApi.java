@@ -1,6 +1,5 @@
 package com.api.freelancer.user;
 
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -13,7 +12,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 @Path("/api/freelancer")
-interface UserApi {
+public interface UserApi {
 
     @GET
     @Path("/users")
@@ -26,17 +25,17 @@ interface UserApi {
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    List<User> getAllUsers() ;
+    List<UserDto> getAllUsers() ;
 
     @POST
     @Path("/users")
-    @ApiOperation(value = "Add a User", response = User.class)
+    @ApiOperation(value = "Add a User", response = UserDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successfully created a User"),
             @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    User addUser(User user);
+    UserDto addUser(UserDto userDto);
 
 }
