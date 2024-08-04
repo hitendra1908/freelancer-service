@@ -5,6 +5,8 @@ import com.api.freelancer.document.DocumentDto;
 import com.api.freelancer.document.DocumentRequestDto;
 import com.api.freelancer.model.Documents;
 import com.api.freelancer.service.DocumentsService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,11 +20,16 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/freelancer")
 public class DocumentsController implements DocumentApi {
+
+    private static final List<String> SUPPORTED_FORMAT = Arrays.asList("pdf", "jpeg", "jpg");
 
     @Autowired
     DocumentsService documentsService;
@@ -47,9 +54,7 @@ public class DocumentsController implements DocumentApi {
     @Override
     public ResponseEntity<DocumentDto> uploadDocument(@RequestPart(value = "request") DocumentRequestDto documentRequest,
                                                       @RequestPart(value = "file") MultipartFile file) {
-        if(file.isEmpty()) {
-         throw new RuntimeException("File is empty"); //TODO create custom exception
-        }
+        validatedFile(file);
         DocumentDto result;
         Documents savedDocument;
         try {
@@ -78,13 +83,28 @@ public class DocumentsController implements DocumentApi {
 
     }
 
+    private void validatedFile(final MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            log.error("No file found in the request");
+            throw new RuntimeException("No file found"); //TODO customised exception
+        }
+        final String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+
+        if (!SUPPORTED_FORMAT.contains(extension)) {
+            log.error("Requested file format not supported.");
+            throw new RuntimeException(String.format("Unsupported file: %s format not supported.", extension));
+        }
+    }
+
     private void validateDocument(Documents documents) {
         String username = documents.getUserName();
 
         if (!documents.getName().startsWith(username)) {
+            //TODO customised exception
             throw new IllegalArgumentException("Document name must start with the owner's username.");
         }
         if (documents.getExpiryDate().isAfter(LocalDate.now().plusMonths(2))) {
+            //TODO customised exception
             throw new IllegalArgumentException("Document expiry date must be at least 2 months from now.");
         }
         documents.setVerified(true);

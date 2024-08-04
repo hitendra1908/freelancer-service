@@ -34,6 +34,8 @@ public interface DocumentApi {
     @ApiOperation(value = "Add a Document", response = DocumentDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successfully uploaded a Document"),
+            @ApiResponse(code = 400, message = "Bad Request"),
+            @ApiResponse(code = 413, message = "File is too large"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     ResponseEntity<DocumentDto> uploadDocument(DocumentRequestDto documentRequest, MultipartFile file);
