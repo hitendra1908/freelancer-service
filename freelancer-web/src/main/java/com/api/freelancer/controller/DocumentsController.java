@@ -3,6 +3,11 @@ package com.api.freelancer.controller;
 import com.api.freelancer.document.DocumentApi;
 import com.api.freelancer.document.DocumentDto;
 import com.api.freelancer.document.DocumentRequestDto;
+import com.api.freelancer.exception.document.DocumentExpiryException;
+import com.api.freelancer.exception.document.DocumentNameException;
+import com.api.freelancer.exception.document.FileException;
+import com.api.freelancer.exception.document.FileNotFoundException;
+import com.api.freelancer.exception.document.UnSupportedFileFormatException;
 import com.api.freelancer.model.Documents;
 import com.api.freelancer.service.DocumentsService;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +74,7 @@ public class DocumentsController implements DocumentApi {
             validateDocument(document);
             savedDocument = documentsService.save(document);
         } catch (IOException exception) {
-            throw new RuntimeException("throw proper customer error with msg");
+            throw new FileException("Error occurred while reading the file");
         }
 
         result = new DocumentDto(savedDocument.getId(),
@@ -86,13 +91,13 @@ public class DocumentsController implements DocumentApi {
     private void validatedFile(final MultipartFile file) {
         if (file == null || file.isEmpty()) {
             log.error("No file found in the request");
-            throw new RuntimeException("No file found"); //TODO customised exception
+            throw new FileNotFoundException("No file found in the request");
         }
         final String extension = FilenameUtils.getExtension(file.getOriginalFilename());
 
         if (!SUPPORTED_FORMAT.contains(extension)) {
             log.error("Requested file format not supported.");
-            throw new RuntimeException(String.format("Unsupported file: %s format not supported.", extension));
+            throw new UnSupportedFileFormatException(String.format("Unsupported file: %s format not supported", extension));
         }
     }
 
@@ -100,12 +105,12 @@ public class DocumentsController implements DocumentApi {
         String username = documents.getUserName();
 
         if (!documents.getName().startsWith(username)) {
-            //TODO customised exception
-            throw new IllegalArgumentException("Document name must start with the owner's username.");
+            log.error("Wrong document name");
+            throw new DocumentNameException("Document name must start with the owner's username");
         }
-        if (documents.getExpiryDate().isAfter(LocalDate.now().plusMonths(2))) {
-            //TODO customised exception
-            throw new IllegalArgumentException("Document expiry date must be at least 2 months from now.");
+        if (documents.getExpiryDate().isBefore(LocalDate.now().plusMonths(2))) {
+            log.error("Document expiring too soon");
+            throw new DocumentExpiryException("Document expiry date must be at least 2 months from now");
         }
         documents.setVerified(true);
     }
