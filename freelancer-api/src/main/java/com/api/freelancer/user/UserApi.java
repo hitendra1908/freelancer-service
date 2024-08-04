@@ -3,6 +3,7 @@ package com.api.freelancer.user;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.http.ResponseEntity;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -23,15 +24,15 @@ public interface UserApi {
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    List<UserDto> getAllUsers() ;
+    ResponseEntity<List<UserResponseDto>> getAllUsers() ;
 
     @POST
     @Path("/users")
-    @ApiOperation(value = "Add a User", response = UserDto.class)
+    @ApiOperation(value = "Add a User", response = UserResponseDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successfully created a User"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    UserDto addUser(UserDto userDto);
+    ResponseEntity<UserResponseDto> addUser(UserRequestDto userRequestDto);
 
 }

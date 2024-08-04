@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalDate;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record DocumentDto (
+public record DocumentResponseDto(
         @ApiModelProperty(required = true, value = "unique id of the document")
         Long id,
         @ApiModelProperty(required = true, value = "name of the document")

@@ -1,6 +1,6 @@
 package com.api.freelancer.exception.user;
 
-public class UserException extends RuntimeException {
+public sealed class UserException extends RuntimeException permits InvalidUserException, UserNotFoundException{
 
     public UserException(final String message) {
         super(message);

@@ -1,33 +1,46 @@
 package com.api.freelancer.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
+@Data
 @Entity
 public class Users {
     @Id
-//    @NotBlank //TODO check this validation
-//    @Size(min = 3, max = 50)
+    @NotBlank
+    @Size(min = 4, max = 50)
     private String userName;
 
-   /* @NotBlank
-    @Size(min = 2, max = 50)*/ //TODO check this validation
+    @NotBlank
+    @Size(min = 1, max = 50)
     private String firstName;
 
-//    @NotBlank
-//    @Size(min = 2, max = 50) //TODO check this validation
     private String lastName;
 
-//    @Email
-//    @NotBlank //TODO check this validation jakarta validation
+    @Email
+    @NotBlank
     private String email;
+
+    @OneToMany
+    @JoinColumn(name = "document_id")
+    private List<Documents> documents;
 }
 

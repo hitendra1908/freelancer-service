@@ -6,12 +6,18 @@ import com.api.freelancer.exception.document.DocumentNameException;
 import com.api.freelancer.exception.document.FileException;
 import com.api.freelancer.exception.document.FileNotFoundException;
 import com.api.freelancer.exception.document.UnSupportedFileFormatException;
+import com.api.freelancer.exception.user.InvalidUserException;
 import com.api.freelancer.exception.user.UserException;
+import com.api.freelancer.exception.user.UserNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
+
+@Slf4j
 @RestControllerAdvice
 public class ApplicationExceptionHandler {
 
@@ -39,11 +45,19 @@ public class ApplicationExceptionHandler {
 
     @ExceptionHandler(UserException.class)
     public ProblemDetail handleUserException(UserException exception) {
-        return getProblemDetail(exception, "invalid user");
+        if (exception instanceof InvalidUserException) {
+            return getProblemDetail(exception, "invalid user");
+        }
+        if (exception instanceof UserNotFoundException) {
+            return getProblemDetail(exception, "User not found");
+        }
+        return handleDefaultUserException(exception);
+
     }
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleAllOtherException(Exception exception) {
+        log.error("Generic exception occurred while processing the request: {}", exception.getCause().toString());
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("Something went wrong!");
         return problemDetail;
@@ -57,7 +71,7 @@ public class ApplicationExceptionHandler {
     }
     private ProblemDetail handleDefaultFileException(FileException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
-        problemDetail.setTitle("Business Error occurred");
+        problemDetail.setTitle("Exception while processing document");
         return problemDetail;
     }
 
@@ -70,6 +84,12 @@ public class ApplicationExceptionHandler {
     private ProblemDetail handleDefaultDocumentException(DocumentException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("Business Error occurred");
+        return problemDetail;
+    }
+
+    private ProblemDetail handleDefaultUserException(UserException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        problemDetail.setTitle("User Exception occurred");
         return problemDetail;
     }
 
