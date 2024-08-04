@@ -6,6 +6,7 @@ import com.api.freelancer.exception.document.DocumentNameException;
 import com.api.freelancer.exception.document.FileException;
 import com.api.freelancer.exception.document.FileNotFoundException;
 import com.api.freelancer.exception.document.UnSupportedFileFormatException;
+import com.api.freelancer.exception.user.UserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,6 +35,11 @@ public class ApplicationExceptionHandler {
             return handleDocumentExpiryException(exception);
         }
         return handleDefaultDocumentException(exception);
+    }
+
+    @ExceptionHandler(UserException.class)
+    public ProblemDetail handleUserException(UserException exception) {
+        return getProblemDetail(exception, "invalid user");
     }
 
     @ExceptionHandler(Exception.class)
