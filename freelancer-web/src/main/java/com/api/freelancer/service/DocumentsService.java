@@ -11,76 +11,62 @@ import com.api.freelancer.model.Documents;
 import com.api.freelancer.model.Users;
 import com.api.freelancer.repository.DocumentsRepository;
 import com.api.freelancer.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DocumentsService {
 
-    private static final List<String> SUPPORTED_FORMAT = Arrays.asList("pdf", "jpeg", "jpg");
+    private static final List<String> SUPPORTED_FORMAT = List.of("pdf", "jpeg", "jpg");
 
-    @Autowired
-    DocumentsRepository documentsRepository;
-
-    @Autowired
-    UserRepository userRepository;
+    private final DocumentsRepository documentsRepository;
+    private final UserRepository userRepository;
 
     public DocumentResponseDto save(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
 
         validateDocument(incomingDoc, uploadedFile);
 
-        final Users user = userRepository.findByUserName(incomingDoc.userName());
-        if(user == null) {
-            throw new UserNotFoundException("Wrong userName: No user found for the giver userName : "+incomingDoc.userName());
-        }
+        Users user = Optional.ofNullable(userRepository.findByUserName(incomingDoc.userName()))
+                .orElseThrow(() -> new UserNotFoundException("Wrong userName: No user found for the given userName : " + incomingDoc.userName()));
 
         Documents savedDocument = saveDocument(incomingDoc, uploadedFile, user);
 
-        return new DocumentResponseDto(savedDocument.getId(),
+        return new DocumentResponseDto(
+                savedDocument.getId(),
                 savedDocument.getName(),
                 savedDocument.getDocumentType(),
                 savedDocument.getUser().getUserName(),
                 savedDocument.getFileType(),
                 savedDocument.getExpiryDate(),
-                savedDocument.isVerified());
-
+                savedDocument.isVerified()
+        );
     }
 
     private Documents saveDocument(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile, final Users user) {
-        Documents savedDocument;
+        Documents document = Documents.builder()
+                .name(uploadedFile.getOriginalFilename())
+                .documentType(incomingDoc.documentType())
+                .fileType(uploadedFile.getContentType())
+                .expiryDate(incomingDoc.expiryDate())
+                .user(user)
+                .verified(true)
+                .build();
 
-       // try {
-            Documents document = Documents.builder()
-                    .name(uploadedFile.getOriginalFilename())
-                    .documentType(incomingDoc.documentType())
-                   // .content(uploadedFile.getBytes())
-                    .fileType(uploadedFile.getContentType())
-                    .expiryDate(incomingDoc.expiryDate())
-                    .user(user)
-                    .verified(true)
-                    .build();
-
-            savedDocument = documentsRepository.save(document);
-
-       /* } catch (IOException exception) {
-            throw new FileException("Error occurred while reading the file");
-        }*/
-        return savedDocument;
+        return documentsRepository.save(document); // TODO check if we need id? check if want 2 documents with same name?
     }
 
-
     private void validateDocument(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
-
-        validatedFile(uploadedFile);
+        validateFile(uploadedFile);
 
         if (!Objects.requireNonNull(uploadedFile.getOriginalFilename()).startsWith(incomingDoc.userName())) {
             log.error("Wrong document name");
@@ -92,13 +78,13 @@ public class DocumentsService {
         }
     }
 
-    private void validatedFile(final MultipartFile uploadedFile) {
+    private void validateFile(final MultipartFile uploadedFile) {
         if (uploadedFile == null || uploadedFile.isEmpty()) {
             log.error("No file found in the request");
             throw new FileNotFoundException("No file found in the request");
         }
-        final String extension = FilenameUtils.getExtension(uploadedFile.getOriginalFilename());
 
+        String extension = FilenameUtils.getExtension(uploadedFile.getOriginalFilename());
         if (!SUPPORTED_FORMAT.contains(extension)) {
             log.error("Requested file format not supported.");
             throw new UnSupportedFileFormatException(String.format("Unsupported file: %s format not supported", extension));
