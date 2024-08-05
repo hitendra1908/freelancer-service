@@ -57,7 +57,7 @@ public class ApplicationExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleAllOtherException(Exception exception) {
-        log.error("Generic exception occurred while processing the request: {}", exception.getCause().toString());
+        log.error("Generic exception occurred while processing the request: ", exception);
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("Something went wrong!");
         return problemDetail;

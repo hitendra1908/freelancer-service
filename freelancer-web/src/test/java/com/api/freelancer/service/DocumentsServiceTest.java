@@ -47,14 +47,15 @@ class DocumentsServiceTest {
         Users user = new Users();
         user.setUserName("testUser");
 
-        Documents document = new Documents();
-        document.setId(1L);
-        document.setName("testUser_document.pdf");
-        document.setDocumentType("testDocType");
-        document.setUser(user);
-        document.setFileType("application/pdf");
-        document.setExpiryDate(LocalDate.now().plusMonths(3));
-        document.setVerified(true);
+        Documents document = Documents.builder()
+                .id(1L)
+                .name("testUser_document.pdf")
+                .documentType("testDocType")
+                .user(user)
+                .fileType("application/pdf")
+                .expiryDate(LocalDate.now().plusMonths(3))
+                .verified(true)
+                .build();
 
         when(userRepository.findByUserName("testUser")).thenReturn(user);
         when(documentsRepository.save(any(Documents.class))).thenReturn(document);
