@@ -51,7 +51,7 @@ public class UserService {
         validateIncomingUser(userRequestDto);
 
         Users userToUpdate = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User you are trying to retrieve is not found"));
+                .orElseThrow(() -> new UserNotFoundException("User you are trying to update is not found"));
 
         if (!userToUpdate.getUserName().equals(userRequestDto.userName())) {
             throw new UserNameException("Changing username is not allowed");

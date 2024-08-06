@@ -57,17 +57,18 @@ class NotificationServiceTest {
 
     @Test
     void testSendNotification() {
-        notificationService.sendNotification(validUser, validDocument);
+        String message = "Document : testUser_document.pdf for user: ironMan successfully uploaded and verified.";
+        notificationService.sendNotification(validUser, validDocument.getName(), message);
 
         ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
         verify(notificationRepository, times(1)).save(notificationCaptor.capture());
         Notification savedNotification = notificationCaptor.getValue();
 
         assertEquals(validUser, savedNotification.getReceiver());
-        assertEquals(validDocument, savedNotification.getDocument());
+        assertEquals(validDocument.getName(), savedNotification.getDocumentName());
         assertEquals(LocalDateTime.now().getDayOfMonth(), savedNotification.getTimestamp().getDayOfMonth());
 
-        verify(kafkaProducer, times(1)).sendMessage("Document : testUser_document.pdf for user: ironMan successfully uploaded and verified.");
+        verify(kafkaProducer, times(1)).sendMessage(message);
         verify(notificationRepository, times(1)).save(any());
     }
 }

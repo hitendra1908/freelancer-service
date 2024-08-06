@@ -1,7 +1,6 @@
 package com.api.freelancer.service;
 
 import com.api.freelancer.kafka.KafkaProducer;
-import com.api.freelancer.model.Documents;
 import com.api.freelancer.model.Notification;
 import com.api.freelancer.model.Users;
 import com.api.freelancer.repository.NotificationRepository;
@@ -19,18 +18,18 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final KafkaProducer kafkaProducer;
 
-    public void sendNotification(Users user, Documents document) {
+    public void sendNotification(final Users user, final String documentName, final String message) {
         Notification notification = Notification.builder()
                         .receiver(user)
-                        .document(document)
+                        .documentName(documentName)
                         .timestamp(LocalDateTime.now())
                         .build();
 
         notificationRepository.save(notification);
 
-        kafkaProducer.sendMessage("Document : "+document.getName() +" for user: "+user.getUserName() + " successfully uploaded and verified.");
+        kafkaProducer.sendMessage(message);
 
-        log.info("message sent to kafka topic!!");
+        log.info("message sent to kafka topic --> {}", message);
 
     }
 }

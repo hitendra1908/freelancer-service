@@ -3,6 +3,8 @@ package com.api.freelancer.exception;
 import com.api.freelancer.exception.document.DocumentException;
 import com.api.freelancer.exception.document.DocumentExpiryException;
 import com.api.freelancer.exception.document.DocumentNameException;
+import com.api.freelancer.exception.document.DocumentNotFoundException;
+import com.api.freelancer.exception.document.DuplicateDocumentException;
 import com.api.freelancer.exception.document.FileException;
 import com.api.freelancer.exception.document.FileNotFoundException;
 import com.api.freelancer.exception.document.UnSupportedFileFormatException;
@@ -39,6 +41,12 @@ public class ApplicationExceptionHandler {
         }
         if (exception instanceof DocumentExpiryException) {
             return getProblemDetailForBadRequest(exception, "Document expiring too soon");
+        }
+        if (exception instanceof DuplicateDocumentException) {
+            return getProblemDetailForConflict(exception, "Document already exists");
+        }
+        if (exception instanceof DocumentNotFoundException) {
+            return getProblemDetailForBadRequest(exception, "Document not found");
         }
         return handleDefaultDocumentException(exception);
     }

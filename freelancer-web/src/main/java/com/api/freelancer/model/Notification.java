@@ -25,7 +25,5 @@ public class Notification {
     @JoinColumn(name = "receiver_id")
     private Users receiver;
 
-    @ManyToOne
-    @JoinColumn(name = "document_id")
-    private Documents document;
+    private String documentName;
 }

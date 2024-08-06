@@ -159,7 +159,7 @@ public class UserServiceTest {
 
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.updateUser(1L, userRequestDto));
 
-        assertEquals("User you are trying to retrieve is not found", exception.getMessage());
+        assertEquals("User you are trying to update is not found", exception.getMessage());
     }
 
     @Test
