@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -31,28 +32,22 @@ public class DocumentsService {
 
     private final DocumentsRepository documentsRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
-    public DocumentResponseDto save(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
+    public DocumentResponseDto createDocument(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
 
         validateDocument(incomingDoc, uploadedFile);
 
         Users user = Optional.ofNullable(userRepository.findByUserName(incomingDoc.userName()))
                 .orElseThrow(() -> new UserNotFoundException("Wrong userName: No user found for the given userName : " + incomingDoc.userName()));
 
-        Documents savedDocument = saveDocument(incomingDoc, uploadedFile, user);
+        Documents savedDocument = saveDocumentAndSendNotification(incomingDoc, uploadedFile, user);
 
-        return new DocumentResponseDto(
-                savedDocument.getId(),
-                savedDocument.getName(),
-                savedDocument.getDocumentType(),
-                savedDocument.getUser().getUserName(),
-                savedDocument.getFileType(),
-                savedDocument.getExpiryDate(),
-                savedDocument.isVerified()
-        );
+        return getDocumentResponseDto(savedDocument);
     }
 
-    private Documents saveDocument(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile, final Users user) {
+    @Transactional
+    private Documents saveDocumentAndSendNotification(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile, final Users user) {
         Documents document = Documents.builder()
                 .name(uploadedFile.getOriginalFilename())
                 .documentType(incomingDoc.documentType())
@@ -62,7 +57,23 @@ public class DocumentsService {
                 .verified(true)
                 .build();
 
-        return documentsRepository.save(document); // TODO check if we need id? check if want 2 documents with same name?
+        Documents savedDocument = documentsRepository.save(document); // TODO check if we need id? check if want 2 documents with same name?
+        if(savedDocument.isVerified()) {
+            notificationService.sendNotification(user, savedDocument);
+        }
+        return savedDocument;
+    }
+
+    private static DocumentResponseDto getDocumentResponseDto(final Documents savedDocument) {
+        return DocumentResponseDto.builder()
+                .id(savedDocument.getId())
+                .name(savedDocument.getName())
+                .documentType(savedDocument.getDocumentType())
+                .userName(savedDocument.getUser().getUserName())
+                .fileType(savedDocument.getFileType())
+                .expiryDate(savedDocument.getExpiryDate())
+                .verified(savedDocument.isVerified())
+                .build();
     }
 
     private void validateDocument(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {

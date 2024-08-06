@@ -25,7 +25,7 @@ public class DocumentsController implements DocumentApi {
     @Override
     public ResponseEntity<DocumentResponseDto> uploadDocument(@RequestPart(value = "request") DocumentRequestDto documentRequest,
                                                               @RequestPart(value = "file") MultipartFile file) {
-        DocumentResponseDto document = documentsService.save(documentRequest, file);
+        DocumentResponseDto document = documentsService.createDocument(documentRequest, file);
         return ResponseEntity.ok(document);
 
     }

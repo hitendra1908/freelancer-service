@@ -3,9 +3,11 @@ package com.api.freelancer.user;
 import com.api.freelancer.document.DocumentResponseDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserResponseDto(
 

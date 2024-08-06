@@ -41,25 +41,25 @@ public class UserService {
                 .map(this::mapToDocumentResponseDto)
                 .toList();
 
-        return new UserResponseDto(
-                user.getUserName(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                documentResponseDtoList
-        );
+        return UserResponseDto.builder()
+                .userName(user.getUserName())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .documents(documentResponseDtoList)
+                .build();
     }
 
     private DocumentResponseDto mapToDocumentResponseDto(Documents document) {
-        return new DocumentResponseDto(
-                document.getId(),
-                document.getName(),
-                document.getDocumentType(),
-                document.getUser().getUserName(),
-                document.getFileType(),
-                document.getExpiryDate(),
-                document.isVerified()
-        );
+        return DocumentResponseDto.builder()
+                .id(document.getId())
+                .name(document.getName())
+                .documentType(document.getDocumentType())
+                .userName(document.getUser().getUserName())
+                .fileType(document.getFileType())
+                .expiryDate(document.getExpiryDate())
+                .verified(document.isVerified())
+                .build();
     }
 
     private Users mapToUsers(UserRequestDto userRequestDto) {

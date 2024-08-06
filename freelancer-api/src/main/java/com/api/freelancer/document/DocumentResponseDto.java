@@ -3,9 +3,11 @@ package com.api.freelancer.document;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 
 import java.time.LocalDate;
 
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record DocumentResponseDto(
         @ApiModelProperty(required = true, value = "unique id of the document")

@@ -41,7 +41,7 @@ class DocumentsControllerTest {
                 true
         );
 
-        when(documentsService.save(requestDto, file)).thenReturn(documentResponseDto);
+        when(documentsService.createDocument(requestDto, file)).thenReturn(documentResponseDto);
 
         DocumentResponseDto actualResponse = documentsController.uploadDocument(requestDto, file).getBody();
 
