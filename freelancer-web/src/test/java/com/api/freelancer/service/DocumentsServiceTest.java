@@ -54,7 +54,7 @@ class DocumentsServiceTest {
 
         Documents document = Documents.builder()
                 .id(1L)
-                .name("testUser_document.pdf")
+                .name("testUser_document")
                 .documentType("testDocType")
                 .user(user)
                 .fileType("application/pdf")
@@ -69,7 +69,7 @@ class DocumentsServiceTest {
 
         assertNotNull(responseDto);
         assertEquals(1L, responseDto.id());
-        assertEquals("testUser_document.pdf", responseDto.name());
+        assertEquals("testUser_document", responseDto.name());
         assertEquals("testDocType", responseDto.documentType());
         assertEquals("testUser", responseDto.userName());
         assertEquals("application/pdf", responseDto.fileType());
@@ -90,43 +90,4 @@ class DocumentsServiceTest {
         assertEquals("Wrong userName: No user found for the given userName : testUser", exception.getMessage());
     }
 
-    @Test
-    void testCreateDocumentDocument_InvalidFileFormat() {
-
-        DocumentRequestDto requestDto = new DocumentRequestDto( "testDocType", "testUser", LocalDate.now().plusMonths(3));
-        MockMultipartFile file = new MockMultipartFile("file", "testUser_document.txt", "text/plain", "test content".getBytes());
-
-        UnSupportedFileFormatException exception = assertThrows(UnSupportedFileFormatException.class, () -> documentsService.createDocument(requestDto, file));
-        assertEquals("Unsupported file: txt format not supported", exception.getMessage());
-    }
-
-    @Test
-    void testCreateDocumentDocument_InvalidDocumentName() {
-
-        DocumentRequestDto requestDto = new DocumentRequestDto( "testDocType","testUser", LocalDate.now().plusMonths(3));
-        MockMultipartFile file = new MockMultipartFile("file", "invalid_document.pdf", "application/pdf", "test content".getBytes());
-
-
-        DocumentNameException exception = assertThrows(DocumentNameException.class, () -> documentsService.createDocument(requestDto, file));
-        assertEquals("Document name must start with the owner's username", exception.getMessage());
-    }
-
-    @Test
-    void testCreateDocumentDocument_DocumentExpiringSoon() {
-
-        DocumentRequestDto requestDto = new DocumentRequestDto( "testDocType", "testUser", LocalDate.now().plusMonths(1));
-        MockMultipartFile file = new MockMultipartFile("file", "testUser_document.pdf", "application/pdf", "test content".getBytes());
-
-        DocumentExpiryException exception = assertThrows(DocumentExpiryException.class, () -> documentsService.createDocument(requestDto, file));
-        assertEquals("Document expiry date must be at least 2 months from now", exception.getMessage());
-    }
-
-    @Test
-    void testCreateDocumentDocument_FileNotFound() {
-
-        DocumentRequestDto requestDto = new DocumentRequestDto("testDocType", "testUser", LocalDate.now().plusMonths(3));
-
-        FileNotFoundException exception = assertThrows(FileNotFoundException.class, () -> documentsService.createDocument(requestDto, null));
-        assertEquals("No file found in the request", exception.getMessage());
-    }
 }

@@ -83,7 +83,9 @@ public class UserServiceTest {
         UserRequestDto userRequestDto = new UserRequestDto("john_doe", "John", "Doe", "john@example.com");
         when(userRepository.save(any(Users.class))).thenThrow(DataIntegrityViolationException.class);
 
-        assertThrows(DuplicateUserException.class, () -> userService.save(userRequestDto));
+        DuplicateUserException exception = assertThrows(DuplicateUserException.class, () -> userService.save(userRequestDto));
+
+        assertEquals("User already exists with username: john_doe", exception.getMessage());
     }
 
     @Test
@@ -119,7 +121,9 @@ public class UserServiceTest {
                 .build();
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(existingUser));
 
-        assertThrows(UserNameException.class, () -> userService.updateUser(1L, userRequestDto));
+        UserException exception = assertThrows(UserNameException.class, () -> userService.updateUser(1L, userRequestDto));
+
+        assertEquals("Changing username is not allowed", exception.getMessage());
     }
 
     @Test
@@ -143,7 +147,9 @@ public class UserServiceTest {
     void shouldThrowUserNotFoundException_WhenWrongIdIsPassed() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.findUserById(1L));
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.findUserById(1L));
+
+        assertEquals("User you are trying to retrieve is not found", exception.getMessage());
     }
 
     @Test
@@ -151,7 +157,9 @@ public class UserServiceTest {
         UserRequestDto userRequestDto = new UserRequestDto("john_doe", "John", "Doe", "john@example.com");
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.updateUser(1L, userRequestDto));
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.updateUser(1L, userRequestDto));
+
+        assertEquals("User you are trying to retrieve is not found", exception.getMessage());
     }
 
     @Test

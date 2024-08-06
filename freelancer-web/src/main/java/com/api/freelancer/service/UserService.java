@@ -54,7 +54,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User you are trying to retrieve is not found"));
 
         if (!userToUpdate.getUserName().equals(userRequestDto.userName())) {
-            throw new UserNameException("Updating username is not possible");
+            throw new UserNameException("Changing username is not allowed");
         }
 
         userToUpdate.setFirstName(userRequestDto.firstName());

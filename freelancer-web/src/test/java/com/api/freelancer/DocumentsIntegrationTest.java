@@ -45,7 +45,8 @@ public class DocumentsIntegrationTest extends AbstractIntegrationTest{
                 .post("/documents")
         .then()
                 .statusCode(200)
-                .body(containsString("testUser_document.pdf"),
-                        containsString("testUser"));
+                .body(containsString("testUser_document"),
+                        containsString("testUser"),
+                        containsString("TYPE1"));
     }
 }
