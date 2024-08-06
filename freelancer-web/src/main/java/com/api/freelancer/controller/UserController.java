@@ -7,7 +7,9 @@ import com.api.freelancer.user.UserResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +34,20 @@ public class UserController implements UserApi {
     @Override
     public ResponseEntity<UserResponseDto> addUser(@RequestBody UserRequestDto userRequestDto) {
         return ResponseEntity.ok(userService.save(userRequestDto));
+    }
+
+    @GetMapping("/users/{id}")
+    @Override
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userService.findUserById(id));
+    }
+
+
+    @PutMapping("/users/{id}")
+    @Override
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable("id") Long id,
+                                                      @RequestBody UserRequestDto userRequestDto) {
+        return ResponseEntity.ok(userService.updateUser(id, userRequestDto));
     }
 
 }

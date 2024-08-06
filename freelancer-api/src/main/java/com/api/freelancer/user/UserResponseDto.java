@@ -10,8 +10,12 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserResponseDto(
+//TODO check why response Dto are not visible in swagger file
 
-        @ApiModelProperty(required = true, value = "username of the user")
+        @ApiModelProperty(required = true, value = "unique id of the user")
+        Long id,
+
+        @ApiModelProperty(required = true, value = "username of the user :must be unique")
         String userName,
 
         @ApiModelProperty(required = true, value = "first name of the user")

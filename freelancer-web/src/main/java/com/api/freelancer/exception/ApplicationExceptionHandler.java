@@ -6,16 +6,16 @@ import com.api.freelancer.exception.document.DocumentNameException;
 import com.api.freelancer.exception.document.FileException;
 import com.api.freelancer.exception.document.FileNotFoundException;
 import com.api.freelancer.exception.document.UnSupportedFileFormatException;
+import com.api.freelancer.exception.user.DuplicateUserException;
 import com.api.freelancer.exception.user.InvalidUserException;
 import com.api.freelancer.exception.user.UserException;
+import com.api.freelancer.exception.user.UserNameException;
 import com.api.freelancer.exception.user.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.Arrays;
 
 @Slf4j
 @RestControllerAdvice
@@ -24,10 +24,10 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler(FileException.class)
     public ProblemDetail handleFileException(FileException exception) {
         if (exception instanceof FileNotFoundException) {
-            return handleFileNotFoundException(exception);
+           return getProblemDetailForBadRequest(exception, "File not found");
         }
         if (exception instanceof UnSupportedFileFormatException) {
-           return handleUnSupportedFileFormatException(exception);
+            return getProblemDetailForBadRequest(exception, "Wrong file format");
         }
         return handleDefaultFileException(exception);
     }
@@ -35,10 +35,10 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler(DocumentException.class)
     public ProblemDetail handleDocumentException(DocumentException exception) {
         if (exception instanceof DocumentNameException) {
-            return handleDocumentNameException(exception);
+            return getProblemDetailForBadRequest(exception, "Wrong document name");
         }
         if (exception instanceof DocumentExpiryException) {
-            return handleDocumentExpiryException(exception);
+            return getProblemDetailForBadRequest(exception, "Document expiring too soon");
         }
         return handleDefaultDocumentException(exception);
     }
@@ -46,10 +46,16 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler(UserException.class)
     public ProblemDetail handleUserException(UserException exception) {
         if (exception instanceof InvalidUserException) {
-            return getProblemDetail(exception, "invalid user");
+            return getProblemDetailForBadRequest(exception, "invalid user");
         }
         if (exception instanceof UserNotFoundException) {
-            return getProblemDetail(exception, "User not found");
+            return getProblemDetailForBadRequest(exception, "User not found");
+        }
+        if (exception instanceof DuplicateUserException) {
+            return getProblemDetailForConflict(exception, "username must be unique");
+        }
+        if (exception instanceof UserNameException) {
+            return getProblemDetailForBadRequest(exception, "username cannot be updated");
         }
         return handleDefaultUserException(exception);
 
@@ -63,24 +69,12 @@ public class ApplicationExceptionHandler {
         return problemDetail;
     }
 
-    private ProblemDetail handleFileNotFoundException(FileException exception) {
-        return getProblemDetail(exception, "File not found");
-    }
-    private ProblemDetail handleUnSupportedFileFormatException(FileException exception) {
-        return getProblemDetail(exception, "Wrong file format");
-    }
     private ProblemDetail handleDefaultFileException(FileException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("Exception while processing document");
         return problemDetail;
     }
 
-    private ProblemDetail handleDocumentNameException(DocumentException exception) {
-        return getProblemDetail(exception, "Wrong document name");
-    }
-    private ProblemDetail handleDocumentExpiryException(DocumentException exception) {
-        return getProblemDetail(exception, "Document expiring too soon");
-    }
     private ProblemDetail handleDefaultDocumentException(DocumentException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("Business Error occurred");
@@ -93,8 +87,14 @@ public class ApplicationExceptionHandler {
         return problemDetail;
     }
 
-    private static ProblemDetail getProblemDetail(Exception exception, String title) {
+    private static ProblemDetail getProblemDetailForBadRequest(Exception exception, String title) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+        problemDetail.setTitle(title);
+        return problemDetail;
+    }
+
+    private static ProblemDetail getProblemDetailForConflict(Exception exception, String title) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
         problemDetail.setTitle(title);
         return problemDetail;
     }

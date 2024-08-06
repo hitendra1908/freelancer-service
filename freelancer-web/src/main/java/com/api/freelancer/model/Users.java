@@ -1,5 +1,6 @@
 package com.api.freelancer.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +26,10 @@ import java.util.List;
 @Entity
 public class Users {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique=true)
     @NotBlank
     @Size(min = 4, max = 50)
     private String userName;

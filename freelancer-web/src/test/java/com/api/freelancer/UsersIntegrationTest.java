@@ -22,7 +22,7 @@ public class UsersIntegrationTest extends AbstractIntegrationTest{
     @Test
     void testSaveUser() {
 
-        UserResponseDto user1 = new UserResponseDto("testUser", "Tony", "Stark", "tony.stark@example.com", null);
+        UserResponseDto user1 = new UserResponseDto(1L, "testUser", "Tony", "Stark", "tony.stark@example.com", null);
 
         given()
                 .contentType(ContentType.JSON)

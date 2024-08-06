@@ -26,9 +26,9 @@ public class UserControllerTest {
     private UserService userService;
 
     @Test
-    public void testGetAllUsers() {
-        UserResponseDto user1 = new UserResponseDto("ironMan", "Tony", "Stark", "tony.stark@example.com", null);
-        UserResponseDto user2 = new UserResponseDto("batman", "Bruce", "Wayne", "bruce.wayne@example.com", null);
+    public void shouldGetAllUsers() {
+        UserResponseDto user1 = new UserResponseDto(1L,"ironMan", "Tony", "Stark", "tony.stark@example.com", null);
+        UserResponseDto user2 = new UserResponseDto(2L, "batman", "Bruce", "Wayne", "bruce.wayne@example.com", null);
         List<UserResponseDto> expectedUsers = Arrays.asList(user1, user2);
 
         when(userService.findAll()).thenReturn(expectedUsers);
@@ -42,15 +42,50 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testAddUser() {
+    public void shouldSaveAndReturnUser() {
         UserRequestDto userRequestDto = new UserRequestDto("ironMan", "Tony", "Stark", "tony.stark@example.com");
-        UserResponseDto expectedUserResponseDto = new UserResponseDto("ironMan", "Tony", "Stark", "tony.stark@example.com", null);
+        UserResponseDto expectedUserResponseDto = new UserResponseDto(1L, "ironMan", "Tony", "Stark", "tony.stark@example.com", null);
 
         when(userService.save(userRequestDto)).thenReturn(expectedUserResponseDto);
 
-        UserResponseDto actualResponse = userController.addUser(userRequestDto).getBody();
+        UserResponseDto actualUser = userController.addUser(userRequestDto).getBody();
 
-        assertNotNull(actualResponse);
-        assertEquals("ironMan", actualResponse.userName());
+        assertNotNull(actualUser);
+        assertEquals("ironMan", actualUser.userName());
+        assertEquals("Tony", actualUser.firstName());
+        assertEquals("Stark", actualUser.lastName());
+        assertEquals("tony.stark@example.com", actualUser.email());
+    }
+
+    @Test
+    public void shouldUpdateAndReturnUser() {
+        UserRequestDto userRequestDto = new UserRequestDto("ironMan", "Tony", "Stark", "tony.stark@example.com");
+        UserResponseDto expectedUserResponseDto = new UserResponseDto(1L, "ironMan", "Tony", "Stark", "tony.stark@example.com", null);
+
+        when(userService.updateUser(1L, userRequestDto)).thenReturn(expectedUserResponseDto);
+
+        UserResponseDto actualUser = userController.updateUser(1L, userRequestDto).getBody();
+
+        assertNotNull(actualUser);
+        assertEquals("ironMan", actualUser.userName());
+        assertEquals("Tony", actualUser.firstName());
+        assertEquals("Stark", actualUser.lastName());
+        assertEquals("tony.stark@example.com", actualUser.email());
+    }
+
+    @Test
+    public void shouldReturnUser_WhenIdIsPassed() {
+        UserResponseDto user = new UserResponseDto(1L,"ironMan", "Tony", "Stark", "tony.stark@example.com", null);
+
+        when(userService.findUserById(1L)).thenReturn(user);
+
+        UserResponseDto actualUser = userController.getUserById(1L).getBody();
+
+        assertNotNull(actualUser);
+        assertEquals("ironMan", actualUser.userName());
+        assertEquals("Tony", actualUser.firstName());
+        assertEquals("Stark", actualUser.lastName());
+        assertEquals("tony.stark@example.com", actualUser.email());
+
     }
 }
