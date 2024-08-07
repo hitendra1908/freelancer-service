@@ -1,5 +1,16 @@
 services:
 
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=pass@123
+      - POSTGRES_USER=tadaah
+      - POSTGRES_DB=freelancedb
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
