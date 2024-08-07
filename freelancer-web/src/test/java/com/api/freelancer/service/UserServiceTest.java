@@ -4,6 +4,7 @@ import com.api.freelancer.exception.user.DuplicateUserException;
 import com.api.freelancer.exception.user.UserException;
 import com.api.freelancer.exception.user.UserNameException;
 import com.api.freelancer.exception.user.UserNotFoundException;
+import com.api.freelancer.model.Documents;
 import com.api.freelancer.model.Users;
 import com.api.freelancer.repository.DocumentsRepository;
 import com.api.freelancer.repository.UserRepository;
@@ -17,12 +18,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.anyString;
@@ -42,6 +45,7 @@ public class UserServiceTest {
 
     private UserRequestDto validUserRequestDto;
     private Users validUser;
+    private Documents document;
 
     @BeforeEach
     void setUp() {
@@ -51,6 +55,15 @@ public class UserServiceTest {
                 .firstName("Tony")
                 .lastName("Stark")
                 .email("tony.stark@example.com")
+                .build();
+        document = Documents.builder()
+                .id(1L)
+                .name("ironMan_document")
+                .documentType("testDocType")
+                .user(validUser)
+                .fileType("application/pdf")
+                .expiryDate(LocalDate.now().plusMonths(3))
+                .verified(true)
                 .build();
     }
 
@@ -127,7 +140,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void shouldReturnUser_WhenCorrectIdIsPassed() {
+    void shouldReturnUser_WhenUserHasNoDocument() {
         Users user = Users.builder()
                 .id(1L)
                 .userName("john_doe")
@@ -141,6 +154,25 @@ public class UserServiceTest {
         UserResponseDto responseDto = userService.findUserById(1L);
         assertNotNull(responseDto);
         assertEquals("john_doe", responseDto.userName());
+        assertTrue(responseDto.documents().isEmpty());
+    }
+
+    @Test
+    void shouldReturnUser_WhenUserHasDocument() {
+        Users user = Users.builder()
+                .id(1L)
+                .userName("john_doe")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@example.com")
+                .build();
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(documentsRepository.findByUserUserName(anyString())).thenReturn(List.of(document));
+
+        UserResponseDto responseDto = userService.findUserById(1L);
+        assertNotNull(responseDto);
+        assertEquals("john_doe", responseDto.userName());
+        assertEquals(1, responseDto.documents().size());
     }
 
     @Test

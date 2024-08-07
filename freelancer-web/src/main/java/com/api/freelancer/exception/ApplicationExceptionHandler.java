@@ -26,85 +26,79 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler(FileException.class)
     public ProblemDetail handleFileException(FileException exception) {
         if (exception instanceof FileNotFoundException) {
-           return getProblemDetailForBadRequest(exception, "File not found");
-        }
-        if (exception instanceof UnSupportedFileFormatException) {
+            return getProblemDetailForBadRequest(exception, "File not found");
+        } else if (exception instanceof UnSupportedFileFormatException) {
             return getProblemDetailForBadRequest(exception, "Wrong file format");
+        } else {
+            return handleDefaultFileException(exception);
         }
-        return handleDefaultFileException(exception);
     }
 
     @ExceptionHandler(DocumentException.class)
     public ProblemDetail handleDocumentException(DocumentException exception) {
         if (exception instanceof DocumentNameException) {
             return getProblemDetailForBadRequest(exception, "Wrong document name");
-        }
-        if (exception instanceof DocumentExpiryException) {
+        } else if (exception instanceof DocumentExpiryException) {
             return getProblemDetailForBadRequest(exception, "Document expiring too soon");
-        }
-        if (exception instanceof DuplicateDocumentException) {
+        } else if (exception instanceof DuplicateDocumentException) {
             return getProblemDetailForConflict(exception, "Document already exists");
-        }
-        if (exception instanceof DocumentNotFoundException) {
+        } else if (exception instanceof DocumentNotFoundException) {
             return getProblemDetailForBadRequest(exception, "Document not found");
+        } else {
+            return handleDefaultDocumentException(exception);
         }
-        return handleDefaultDocumentException(exception);
     }
 
     @ExceptionHandler(UserException.class)
     public ProblemDetail handleUserException(UserException exception) {
         if (exception instanceof InvalidUserException) {
-            return getProblemDetailForBadRequest(exception, "invalid user");
-        }
-        if (exception instanceof UserNotFoundException) {
+            return getProblemDetailForBadRequest(exception, "Invalid user");
+        } else if (exception instanceof UserNotFoundException) {
             return getProblemDetailForBadRequest(exception, "User not found");
+        } else if (exception instanceof DuplicateUserException) {
+            return getProblemDetailForConflict(exception, "Username must be unique");
+        } else if (exception instanceof UserNameException) {
+            return getProblemDetailForBadRequest(exception, "Username cannot be updated");
+        } else {
+            return handleDefaultUserException(exception);
         }
-        if (exception instanceof DuplicateUserException) {
-            return getProblemDetailForConflict(exception, "username must be unique");
-        }
-        if (exception instanceof UserNameException) {
-            return getProblemDetailForBadRequest(exception, "username cannot be updated");
-        }
-        return handleDefaultUserException(exception);
-
     }
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleAllOtherException(Exception exception) {
         log.error("Generic exception occurred while processing the request: ", exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("Something went wrong!");
         return problemDetail;
     }
 
     private ProblemDetail handleDefaultFileException(FileException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("Exception while processing document");
         return problemDetail;
     }
 
     private ProblemDetail handleDefaultDocumentException(DocumentException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("Business Error occurred");
         return problemDetail;
     }
 
     private ProblemDetail handleDefaultUserException(UserException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("User Exception occurred");
         return problemDetail;
     }
 
     private static ProblemDetail getProblemDetailForBadRequest(Exception exception, String title) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle(title);
         return problemDetail;
     }
 
     private static ProblemDetail getProblemDetailForConflict(Exception exception, String title) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
         problemDetail.setTitle(title);
         return problemDetail;
     }
-
 }
