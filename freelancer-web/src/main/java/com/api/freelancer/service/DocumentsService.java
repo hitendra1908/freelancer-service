@@ -55,6 +55,7 @@ public class DocumentsService {
         Documents document = documentsRepository.findById(id)
                 .orElseThrow(() -> new DocumentNotFoundException("Document you are trying to find is not found."));
 
+        log.debug("Document found with id {}", id);
         return getDocumentResponseDto(document);
     }
 
@@ -63,6 +64,7 @@ public class DocumentsService {
                 .orElseThrow(() -> new DocumentNotFoundException("Document you are trying to delete is not found."));
 
         documentsRepository.delete(document);
+        log.debug("{} deleted from the db", document.getName());
         sendDeleteNotification(document);
     }
 
@@ -73,6 +75,7 @@ public class DocumentsService {
         Documents savedDocument;
         try {
             savedDocument = documentsRepository.save(document);
+            log.debug("{} saved in the db", document.getName());
         } catch (DataIntegrityViolationException exception) {
             throw new DuplicateDocumentException("Document with name: " + document.getName() + " already exists");
         }
@@ -91,7 +94,7 @@ public class DocumentsService {
         updateDocumentFields(document, incomingDoc, uploadedFile, user);
 
         Documents updatedDocument = documentsRepository.save(document);
-
+        log.debug("{} updated in the db", document.getName());
         if (updatedDocument.isVerified()) {
             sendUpdateNotification(user, updatedDocument);
         }
@@ -113,12 +116,15 @@ public class DocumentsService {
     private void sendUploadNotification(Users user, Documents document) {
         String message = String.format("Document: %s for user: %s is successfully uploaded and verified.",
                 document.getName(), user.getUserName());
+        log.debug("sending notification to {} for successfully uploading and validating {}", user.getUserName(),
+                document.getName());
         notificationService.sendNotification(user, document.getName(), message);
     }
 
     private void sendUpdateNotification(Users user, Documents document) {
         String message = String.format("Document: %s for user: %s is successfully updated and verified.",
                 document.getName(), user.getUserName());
+        log.debug("sending notification to {} for successfully updating {}", user.getUserName(), document.getName());
         notificationService.sendNotification(user, document.getName(), message);
     }
 
@@ -126,6 +132,7 @@ public class DocumentsService {
         Users user = document.getUser();
         String message = String.format("Document: %s for user: %s is successfully deleted.",
                 document.getName(), user.getUserName());
+        log.debug("sending notification to {} for successfully deleting {}", user.getUserName(), document.getName());
         notificationService.sendNotification(user, document.getName(), message);
     }
 

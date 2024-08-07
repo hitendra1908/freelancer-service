@@ -32,8 +32,12 @@ public interface DocumentApi {
             @ApiResponse(code = 413, message = "File is too large"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    ResponseEntity<DocumentResponseDto> uploadDocument(@ApiParam(value = "Document details", required = true) DocumentRequestDto documentRequest,
-                                                       @ApiParam(value = "Document to upload", required = true) MultipartFile file);
+    ResponseEntity<DocumentResponseDto> uploadDocument(@ApiParam(name = "Document details",
+                                                                 value = "Document details",
+                                                                 required = true) DocumentRequestDto documentRequest,
+                                                       @ApiParam(name = "Document to upload",
+                                                                 value = "Document to upload",
+                                                                 required = true) MultipartFile file);
 
     @PUT
     @Path("/documents/{id}")
@@ -47,8 +51,13 @@ public interface DocumentApi {
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     ResponseEntity<DocumentResponseDto> updateDocument(@PathParam("id") @ApiParam("id of the user") Long id,
-                                                       @ApiParam(value = "Document details", required = true) DocumentRequestDto documentRequest,
-                                                       @ApiParam(value = "Document to upload", required = true) MultipartFile file);
+                                                       @ApiParam(name = "Document details",
+                                                               value = "Document details to update",
+                                                               required = true) DocumentRequestDto documentRequest,
+                                                       @ApiParam(name = "Document to update",
+                                                               value = "Document to update",
+                                                               required = true,
+                                                               allowMultiple = true) MultipartFile file);
 
     @GET
     @Path("/documents/{id}")

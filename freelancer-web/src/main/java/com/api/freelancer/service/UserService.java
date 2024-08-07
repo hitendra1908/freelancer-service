@@ -12,12 +12,14 @@ import com.api.freelancer.repository.UserRepository;
 import com.api.freelancer.user.UserRequestDto;
 import com.api.freelancer.user.UserResponseDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -109,12 +111,15 @@ public class UserService {
 
     private void validateIncomingUser(UserRequestDto userRequestDto) {
         if (userRequestDto.userName() == null || userRequestDto.userName().length() < 4) {
+            log.error("error occurred while validating username");
             throw new UserException("username should be at least 4 characters");
         }
         if (userRequestDto.firstName() == null || userRequestDto.firstName().isEmpty()) {
+            log.error("error occurred while validating user first name");
             throw new UserException("First name cannot be empty");
         }
         if (!EMAIL_REGEX_PATTERN.matcher(userRequestDto.email()).matches()) {
+            log.error("error occurred while validating user's email address");
             throw new UserException("Invalid email address");
         }
     }

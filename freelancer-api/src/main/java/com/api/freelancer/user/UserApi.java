@@ -53,7 +53,7 @@ public interface UserApi {
     ResponseEntity<UserResponseDto> addUser(@ApiParam(value = "request json", required = true) UserRequestDto userRequestDto);
 
     @PUT
-    @Path("/users")
+    @Path("/users/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a User", response = UserResponseDto.class)
