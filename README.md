@@ -29,7 +29,7 @@ This module implements the APIs defined in the freelancer-api module and exposes
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/hi4566/freelancer-service.git
+   git clone https://github.com/hitendra1908/freelancer-service.git
 
 2. Navigate to the root directory and start Docker:
    ```sh
