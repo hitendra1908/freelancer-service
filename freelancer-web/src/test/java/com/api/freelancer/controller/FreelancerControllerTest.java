@@ -1,8 +1,8 @@
 package com.api.freelancer.controller;
 
-import com.api.freelancer.service.UserService;
-import com.api.freelancer.user.UserRequestDto;
-import com.api.freelancer.user.UserResponseDto;
+import com.api.freelancer.service.FreelancerService;
+import com.api.freelancer.freelancer.FreelancerRequestDto;
+import com.api.freelancer.freelancer.FreelancerResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,27 +20,27 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+public class FreelancerControllerTest {
 
     @InjectMocks
-    private UserController userController;
+    private FreelancerController freelancerController;
 
     @Mock
-    private UserService userService;
+    private FreelancerService freelancerService;
 
-    private UserRequestDto userRequestDto;
-    private UserResponseDto user1;
-    private UserResponseDto user2;
+    private FreelancerRequestDto freelancerRequestDto;
+    private FreelancerResponseDto user1;
+    private FreelancerResponseDto user2;
 
     @BeforeEach
     void setup() {
-        userRequestDto = UserRequestDto.builder()
+        freelancerRequestDto = FreelancerRequestDto.builder()
                 .userName("ironMan")
                 .firstName("Tony")
                 .lastName("Stark")
                 .email("tony.stark@example.com")
                 .build();
-        user1 = UserResponseDto.builder()
+        user1 = FreelancerResponseDto.builder()
                 .id(1L)
                 .userName("ironMan")
                 .firstName("Tony")
@@ -48,7 +48,7 @@ public class UserControllerTest {
                 .email("tony.stark@example.com")
                 .documents(null)
                 .build();
-        user1 = UserResponseDto.builder()
+        user1 = FreelancerResponseDto.builder()
                 .id(2L)
                 .userName("batman")
                 .firstName("Bruce")
@@ -59,47 +59,47 @@ public class UserControllerTest {
     }
 
     @Test
-    public void shouldGetAllUsers() {
-        List<UserResponseDto> expectedUsers = Arrays.asList(user1, user2);
+    public void shouldGetAllFreelancers() {
+        List<FreelancerResponseDto> expectedUsers = Arrays.asList(user1, user2);
 
-        when(userService.findAll()).thenReturn(expectedUsers);
+        when(freelancerService.findAll()).thenReturn(expectedUsers);
 
-        ResponseEntity<List<UserResponseDto>> actualUsers = userController.getAllUsers();
+        ResponseEntity<List<FreelancerResponseDto>> actualUsers = freelancerController.getAllFreelancers();
 
         assertEquals(ResponseEntity.ok(expectedUsers), actualUsers);
-        verify(userService, times(1)).findAll();
+        verify(freelancerService, times(1)).findAll();
 
     }
 
     @Test
     public void shouldSaveAndReturnUser() {
 
-        when(userService.save(userRequestDto)).thenReturn(user1);
+        when(freelancerService.save(freelancerRequestDto)).thenReturn(user1);
 
-        ResponseEntity<UserResponseDto> actualUser = userController.addUser(userRequestDto);
+        ResponseEntity<FreelancerResponseDto> actualUser = freelancerController.addFreelancer(freelancerRequestDto);
 
         assertEquals(ResponseEntity.ok(user1), actualUser);
-        verify(userService, times(1)).save(userRequestDto);
+        verify(freelancerService, times(1)).save(freelancerRequestDto);
     }
 
     @Test
     public void shouldUpdateAndReturnUser() {
-        when(userService.updateUser(1L, userRequestDto)).thenReturn(user1);
+        when(freelancerService.updateUser(1L, freelancerRequestDto)).thenReturn(user1);
 
-        ResponseEntity<UserResponseDto> actualUser = userController.updateUser(1L, userRequestDto);
+        ResponseEntity<FreelancerResponseDto> actualUser = freelancerController.updateFreelancer(1L, freelancerRequestDto);
 
         assertEquals(ResponseEntity.ok(user1), actualUser);
-        verify(userService, times(1)).updateUser(1L, userRequestDto);
+        verify(freelancerService, times(1)).updateUser(1L, freelancerRequestDto);
     }
 
     @Test
     public void shouldReturnUser_WhenIdIsPassed() {
-        when(userService.findUserById(1L)).thenReturn(user1);
+        when(freelancerService.findUserById(1L)).thenReturn(user1);
 
-        ResponseEntity<UserResponseDto> actualUser = userController.getUserById(1L);
+        ResponseEntity<FreelancerResponseDto> actualUser = freelancerController.getFreelancerById(1L);
 
         assertEquals(ResponseEntity.ok(user1), actualUser);
-        verify(userService, times(1)).findUserById(1L);
+        verify(freelancerService, times(1)).findUserById(1L);
 
     }
 }

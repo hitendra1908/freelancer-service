@@ -23,7 +23,7 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "receiver_id")
-    private Users receiver;
+    private Freelancer receiver;
 
     private String documentName;
 }

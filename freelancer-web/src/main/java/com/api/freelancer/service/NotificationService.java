@@ -2,7 +2,7 @@ package com.api.freelancer.service;
 
 import com.api.freelancer.kafka.KafkaProducer;
 import com.api.freelancer.model.Notification;
-import com.api.freelancer.model.Users;
+import com.api.freelancer.model.Freelancer;
 import com.api.freelancer.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +18,9 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final KafkaProducer kafkaProducer;
 
-    public void sendNotification(final Users user, final String documentName, final String message) {
+    public void sendNotification(final Freelancer freelancer, final String documentName, final String message) {
         Notification notification = Notification.builder()
-                        .receiver(user)
+                        .receiver(freelancer)
                         .documentName(documentName)
                         .timestamp(LocalDateTime.now())
                         .build();

@@ -1,15 +1,15 @@
 package com.api.freelancer.service;
 
-import com.api.freelancer.exception.user.DuplicateUserException;
-import com.api.freelancer.exception.user.UserException;
-import com.api.freelancer.exception.user.UserNameException;
-import com.api.freelancer.exception.user.UserNotFoundException;
+import com.api.freelancer.exception.freelancer.DuplicateUserException;
+import com.api.freelancer.exception.freelancer.UserException;
+import com.api.freelancer.exception.freelancer.UserNameException;
+import com.api.freelancer.exception.freelancer.UserNotFoundException;
 import com.api.freelancer.model.Documents;
-import com.api.freelancer.model.Users;
+import com.api.freelancer.model.Freelancer;
 import com.api.freelancer.repository.DocumentsRepository;
-import com.api.freelancer.repository.UserRepository;
-import com.api.freelancer.user.UserRequestDto;
-import com.api.freelancer.user.UserResponseDto;
+import com.api.freelancer.repository.FreelancerRepository;
+import com.api.freelancer.freelancer.FreelancerRequestDto;
+import com.api.freelancer.freelancer.FreelancerResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,30 +34,30 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class FreelancerServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private FreelancerRepository freelancerRepository;
 
     @Mock
     private DocumentsRepository documentsRepository;
 
     @InjectMocks
-    private UserService userService;
+    private FreelancerService freelancerService;
 
-    private UserRequestDto validUserRequestDto;
-    private Users validUser;
+    private FreelancerRequestDto validFreelancerRequestDto;
+    private Freelancer validFreelancer;
     private Documents document;
 
     @BeforeEach
     void setUp() {
-        validUserRequestDto = UserRequestDto.builder()
+        validFreelancerRequestDto = FreelancerRequestDto.builder()
                 .userName("ironMan")
                 .firstName("Tony")
                 .lastName("Stark")
                 .email("tony.stark@example.com")
                 .build();
-        validUser = Users.builder()
+        validFreelancer = Freelancer.builder()
                 .userName("ironMan")
                 .firstName("Tony")
                 .lastName("Stark")
@@ -67,7 +67,7 @@ public class UserServiceTest {
                 .id(1L)
                 .name("ironMan_document")
                 .documentType("testDocType")
-                .user(validUser)
+                .freelancer(validFreelancer)
                 .fileType("application/pdf")
                 .expiryDate(LocalDate.now().plusMonths(3))
                 .verified(true)
@@ -76,11 +76,11 @@ public class UserServiceTest {
 
     @Test
     void findAll_ShouldReturnUserResponseDtoList() {
-        List<Users> users = List.of(validUser);
-        when(userRepository.findAll()).thenReturn(users);
-        when(documentsRepository.findByUserUserName(anyString())).thenReturn(List.of());
+        List<Freelancer> freelancers = List.of(validFreelancer);
+        when(freelancerRepository.findAll()).thenReturn(freelancers);
+        when(documentsRepository.findByFreelancerUserName(anyString())).thenReturn(List.of());
 
-        List<UserResponseDto> result = userService.findAll();
+        List<FreelancerResponseDto> result = freelancerService.findAll();
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -89,10 +89,10 @@ public class UserServiceTest {
 
     @Test
     void save_ShouldReturnSavedUserResponseDto() {
-        when(userRepository.save(any(Users.class))).thenReturn(validUser);
-        when(documentsRepository.findByUserUserName(anyString())).thenReturn(List.of());
+        when(freelancerRepository.save(any(Freelancer.class))).thenReturn(validFreelancer);
+        when(documentsRepository.findByFreelancerUserName(anyString())).thenReturn(List.of());
 
-        UserResponseDto result = userService.save(validUserRequestDto);
+        FreelancerResponseDto result = freelancerService.save(validFreelancerRequestDto);
 
         assertNotNull(result);
         assertEquals("ironMan", result.getUserName());
@@ -100,38 +100,38 @@ public class UserServiceTest {
 
     @Test
     void save_ShouldThrowDuplicateUserException_WhenSameUserName() {
-        UserRequestDto userRequestDto = UserRequestDto.builder()
+        FreelancerRequestDto freelancerRequestDto = FreelancerRequestDto.builder()
                 .userName("john_doe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john@example.com")
                 .build();
-        when(userRepository.save(any(Users.class))).thenThrow(DataIntegrityViolationException.class);
+        when(freelancerRepository.save(any(Freelancer.class))).thenThrow(DataIntegrityViolationException.class);
 
-        DuplicateUserException exception = assertThrows(DuplicateUserException.class, () -> userService.save(userRequestDto));
+        DuplicateUserException exception = assertThrows(DuplicateUserException.class, () -> freelancerService.save(freelancerRequestDto));
 
         assertEquals("User already exists with username: john_doe", exception.getMessage());
     }
 
     @Test
     void update_ShouldUpdateUser() {
-        UserRequestDto userRequestDto = UserRequestDto.builder()
+        FreelancerRequestDto freelancerRequestDto = FreelancerRequestDto.builder()
                 .userName("john_doe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john@example.com")
                 .build();
-        Users existingUser = Users.builder()
+        Freelancer existingFreelancer = Freelancer.builder()
                 .id(1L)
                 .userName("john_doe")
                 .firstName("Johnny")
                 .lastName("Doe")
                 .email("johnny@example.com")
                 .build();
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(existingUser));
-        when(userRepository.save(any(Users.class))).thenReturn(existingUser);
+        when(freelancerRepository.findById(anyLong())).thenReturn(Optional.of(existingFreelancer));
+        when(freelancerRepository.save(any(Freelancer.class))).thenReturn(existingFreelancer);
 
-        UserResponseDto responseDto = userService.updateUser(1L, userRequestDto);
+        FreelancerResponseDto responseDto = freelancerService.updateUser(1L, freelancerRequestDto);
         assertNotNull(responseDto);
         assertEquals("john_doe", responseDto.getUserName());
         assertEquals("John", responseDto.getFirstName());
@@ -139,39 +139,39 @@ public class UserServiceTest {
 
     @Test
     void update_ShouldThrowUserNameException_WhenUpdatingUserName() {
-        UserRequestDto userRequestDto = UserRequestDto.builder()
+        FreelancerRequestDto freelancerRequestDto = FreelancerRequestDto.builder()
                 .userName("jane_doe")
                 .firstName("Jane")
                 .lastName("Doe")
                 .email("jane@example.com")
                 .build();
-        Users existingUser = Users.builder()
+        Freelancer existingFreelancer = Freelancer.builder()
                 .id(1L)
                 .userName("john_doe")
                 .firstName("Johnny")
                 .lastName("Doe")
                 .email("johnny@example.com")
                 .build();
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(existingUser));
+        when(freelancerRepository.findById(anyLong())).thenReturn(Optional.of(existingFreelancer));
 
-        UserException exception = assertThrows(UserNameException.class, () -> userService.updateUser(1L, userRequestDto));
+        UserException exception = assertThrows(UserNameException.class, () -> freelancerService.updateUser(1L, freelancerRequestDto));
 
         assertEquals("Changing username is not allowed", exception.getMessage());
     }
 
     @Test
     void shouldReturnUser_WhenUserHasNoDocument() {
-        Users user = Users.builder()
+        Freelancer freelancer = Freelancer.builder()
                 .id(1L)
                 .userName("john_doe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john@example.com")
                 .build();
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(documentsRepository.findByUserUserName(anyString())).thenReturn(List.of());
+        when(freelancerRepository.findById(anyLong())).thenReturn(Optional.of(freelancer));
+        when(documentsRepository.findByFreelancerUserName(anyString())).thenReturn(List.of());
 
-        UserResponseDto responseDto = userService.findUserById(1L);
+        FreelancerResponseDto responseDto = freelancerService.findUserById(1L);
         assertNotNull(responseDto);
         assertEquals("john_doe", responseDto.getUserName());
         assertTrue(responseDto.getDocuments().isEmpty());
@@ -179,17 +179,17 @@ public class UserServiceTest {
 
     @Test
     void shouldReturnUser_WhenUserHasDocument() {
-        Users user = Users.builder()
+        Freelancer freelancer = Freelancer.builder()
                 .id(1L)
                 .userName("john_doe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john@example.com")
                 .build();
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(documentsRepository.findByUserUserName(anyString())).thenReturn(List.of(document));
+        when(freelancerRepository.findById(anyLong())).thenReturn(Optional.of(freelancer));
+        when(documentsRepository.findByFreelancerUserName(anyString())).thenReturn(List.of(document));
 
-        UserResponseDto responseDto = userService.findUserById(1L);
+        FreelancerResponseDto responseDto = freelancerService.findUserById(1L);
         assertNotNull(responseDto);
         assertEquals("john_doe", responseDto.getUserName());
         assertEquals(1, responseDto.getDocuments().size());
@@ -197,65 +197,65 @@ public class UserServiceTest {
 
     @Test
     void shouldThrowUserNotFoundException_WhenWrongIdIsPassed() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(freelancerRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.findUserById(1L));
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> freelancerService.findUserById(1L));
 
         assertEquals("User you are trying to retrieve is not found", exception.getMessage());
     }
 
     @Test
     void update_ShouldThrowUserNotFoundException_WhenIdDoesNotExist() {
-        UserRequestDto userRequestDto = UserRequestDto.builder()
+        FreelancerRequestDto freelancerRequestDto = FreelancerRequestDto.builder()
                 .userName("john_doe")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john@example.com")
                 .build();
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(freelancerRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.updateUser(1L, userRequestDto));
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> freelancerService.updateUser(1L, freelancerRequestDto));
 
         assertEquals("User you are trying to update is not found", exception.getMessage());
     }
 
     @Test
     void save_ShouldThrowUserException_WhenUserNameIsTooShort() {
-        UserRequestDto invalidRequest = UserRequestDto.builder()
+        FreelancerRequestDto invalidRequest = FreelancerRequestDto.builder()
                 .userName("usr")
                 .firstName("John")
                 .lastName("Doe")
                 .email("john@example.com")
                 .build();
 
-        UserException exception = assertThrows(UserException.class, () -> userService.save(invalidRequest));
+        UserException exception = assertThrows(UserException.class, () -> freelancerService.save(invalidRequest));
 
         assertEquals("username should be at least 4 characters", exception.getMessage());
     }
 
     @Test
     void save_ShouldThrowUserException_WhenFirstNameIsEmpty() {
-        UserRequestDto invalidRequest = UserRequestDto.builder()
+        FreelancerRequestDto invalidRequest = FreelancerRequestDto.builder()
                 .userName("ironMan")
                 .firstName("")
                 .lastName("Stark")
                 .email("tony.stark@example.com")
                 .build();
-        UserException exception = assertThrows(UserException.class, () -> userService.save(invalidRequest));
+        UserException exception = assertThrows(UserException.class, () -> freelancerService.save(invalidRequest));
 
         assertEquals("First name cannot be empty", exception.getMessage());
     }
 
     @Test
     void save_ShouldThrowUserException_WhenEmailIsInvalid() {
-        UserRequestDto invalidRequest = UserRequestDto.builder()
+        FreelancerRequestDto invalidRequest = FreelancerRequestDto.builder()
                 .userName("ironMan")
                 .firstName("Tony")
                 .lastName("Stark")
                 .email("tony.stark@")
                 .build();
 
-        UserException exception = assertThrows(UserException.class, () -> userService.save(invalidRequest));
+        UserException exception = assertThrows(UserException.class, () -> freelancerService.save(invalidRequest));
 
         assertEquals("Invalid email address", exception.getMessage());
     }
@@ -263,12 +263,12 @@ public class UserServiceTest {
     @Test
     void shouldThrowUserNotFoundException_whenEmptyUser() {
         final String userName = "testUser";
-        when(userRepository.findByUserName(userName)).thenReturn(Optional.empty());
+        when(freelancerRepository.findByUserName(userName)).thenReturn(Optional.empty());
 
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.findUserByUserName(userName));
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> freelancerService.findUserByUserName(userName));
 
         assertEquals("Wrong userName: No user found for the given userName: testUser", exception.getMessage());
-        verify(userRepository, times(1))
+        verify(freelancerRepository, times(1))
                 .findByUserName(userName);
     }
 }

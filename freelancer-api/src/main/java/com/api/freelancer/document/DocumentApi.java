@@ -54,7 +54,7 @@ public interface DocumentApi {
             @ApiResponse(code = 413, message = "Uploaded file is too large: maximus size allowed is 5MB"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    ResponseEntity<DocumentResponseDto> updateDocument(@PathParam("id") @ApiParam("id of the user") Long id,
+    ResponseEntity<DocumentResponseDto> updateDocument(@PathParam("id") @ApiParam("id of the document") Long id,
                                                        @ApiParam(name = "Document details",
                                                                value = "Document details to update",
                                                                required = true) DocumentRequestDto documentRequest,
@@ -73,16 +73,16 @@ public interface DocumentApi {
             @ApiResponse(code = 404, message = "Document not found"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    ResponseEntity<DocumentResponseDto> getDocument(@PathParam("id") @ApiParam("id of the user") Long id);
+    ResponseEntity<DocumentResponseDto> getDocument(@PathParam("id") @ApiParam("id of the document") Long id);
 
     @DELETE
     @Path("/documents/{id}")
-    @ApiOperation(value = "Delete a document by id")
+    @ApiOperation(value = "Delete a document by id", response = DocumentResponseDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Successfully deleted a Document"),
             @ApiResponse(code = 404, message = "Document not found"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    ResponseEntity<Void> deleteDocument(@PathParam("id") @ApiParam("id of the user") Long id);
+    ResponseEntity<Void> deleteDocument(@PathParam("id") @ApiParam("id of the document") Long id);
 
 }

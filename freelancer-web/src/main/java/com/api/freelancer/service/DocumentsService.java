@@ -5,7 +5,7 @@ import com.api.freelancer.document.DocumentResponseDto;
 import com.api.freelancer.exception.document.DocumentNotFoundException;
 import com.api.freelancer.exception.document.DuplicateDocumentException;
 import com.api.freelancer.model.Documents;
-import com.api.freelancer.model.Users;
+import com.api.freelancer.model.Freelancer;
 import com.api.freelancer.repository.DocumentsRepository;
 import com.api.freelancer.validator.DocumentValidator;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +22,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class DocumentsService {
 
     private final DocumentsRepository documentsRepository;
-    private final UserService userService;
+    private final FreelancerService freelancerService;
     private final NotificationService notificationService;
 
     public DocumentResponseDto createDocument(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
         DocumentValidator.validateDocument(incomingDoc, uploadedFile);
 
-        Users user = userService.findUserByUserName(incomingDoc.getUserName());
+        Freelancer freelancer = freelancerService.findUserByUserName(incomingDoc.getUserName());
 
-        Documents savedDocument = saveDocumentAndSendNotification(incomingDoc, uploadedFile, user);
+        Documents savedDocument = saveDocumentAndSendNotification(incomingDoc, uploadedFile, freelancer);
 
         return getDocumentResponseDto(savedDocument);
     }
@@ -38,9 +38,9 @@ public class DocumentsService {
     public DocumentResponseDto updateDocument(final Long id, final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
         DocumentValidator.validateDocument(incomingDoc, uploadedFile);
 
-        Users user = userService.findUserByUserName(incomingDoc.getUserName());
+        Freelancer freelancer = freelancerService.findUserByUserName(incomingDoc.getUserName());
 
-        Documents savedDocument = updateDocumentAndSendNotification(id, incomingDoc, uploadedFile, user);
+        Documents savedDocument = updateDocumentAndSendNotification(id, incomingDoc, uploadedFile, freelancer);
 
         return getDocumentResponseDto(savedDocument);
     }
@@ -65,8 +65,8 @@ public class DocumentsService {
     }
 
     @Transactional
-    private Documents saveDocumentAndSendNotification(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile, final Users user) {
-        Documents document = buildDocument(incomingDoc, uploadedFile, user);
+    private Documents saveDocumentAndSendNotification(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile, final Freelancer freelancer) {
+        Documents document = buildDocument(incomingDoc, uploadedFile, freelancer);
 
         Documents savedDocument;
         try {
@@ -77,22 +77,22 @@ public class DocumentsService {
         }
 
         if (savedDocument.isVerified()) {
-            sendUploadNotification(user, savedDocument);
+            sendUploadNotification(freelancer, savedDocument);
         }
         return savedDocument;
     }
 
     @Transactional
-    private Documents updateDocumentAndSendNotification(final Long id, final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile, final Users user) {
+    private Documents updateDocumentAndSendNotification(final Long id, final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile, final Freelancer freelancer) {
         Documents document = documentsRepository.findById(id)
                 .orElseThrow(() -> new DocumentNotFoundException("Document you are trying to update is not found."));
 
-        updateDocumentFields(document, incomingDoc, uploadedFile, user);
+        updateDocumentFields(document, incomingDoc, uploadedFile, freelancer);
 
         Documents updatedDocument = documentsRepository.save(document);
         log.debug("{} updated in the db", document.getName());
         if (updatedDocument.isVerified()) {
-            sendUpdateNotification(user, updatedDocument);
+            sendUpdateNotification(freelancer, updatedDocument);
         }
         return updatedDocument;
     }
@@ -102,58 +102,58 @@ public class DocumentsService {
                 .id(document.getId())
                 .name(document.getName())
                 .documentType(document.getDocumentType())
-                .userName(document.getUser().getUserName())
+                .userName(document.getFreelancer().getUserName())
                 .fileType(document.getFileType())
                 .expiryDate(document.getExpiryDate())
                 .verified(document.isVerified())
                 .build();
     }
 
-    private void sendUploadNotification(Users user, Documents document) {
+    private void sendUploadNotification(Freelancer freelancer, Documents document) {
         String message = String.format("Document: %s for user: %s is successfully uploaded and verified.",
-                document.getName(), user.getUserName());
-        log.debug("sending notification to {} for successfully uploading and validating {}", user.getUserName(),
+                document.getName(), freelancer.getUserName());
+        log.debug("sending notification to {} for successfully uploading and validating {}", freelancer.getUserName(),
                 document.getName());
-        sendNotification(user, document.getName(), message);
+        sendNotification(freelancer, document.getName(), message);
     }
 
-    private void sendUpdateNotification(Users user, Documents document) {
+    private void sendUpdateNotification(Freelancer freelancer, Documents document) {
         String message = String.format("Document: %s for user: %s is successfully updated and verified.",
-                document.getName(), user.getUserName());
-        log.debug("sending notification to {} for successfully updating {}", user.getUserName(), document.getName());
-        sendNotification(user, document.getName(), message);
+                document.getName(), freelancer.getUserName());
+        log.debug("sending notification to {} for successfully updating {}", freelancer.getUserName(), document.getName());
+        sendNotification(freelancer, document.getName(), message);
     }
 
     private void sendDeleteNotification(Documents document) {
-        Users user = document.getUser();
+        Freelancer freelancer = document.getFreelancer();
         String message = String.format("Document: %s for user: %s is successfully deleted.",
-                document.getName(), user.getUserName());
-        log.debug("sending notification to {} for successfully deleting {}", user.getUserName(), document.getName());
-        sendNotification(user, document.getName(), message);
+                document.getName(), freelancer.getUserName());
+        log.debug("sending notification to {} for successfully deleting {}", freelancer.getUserName(), document.getName());
+        sendNotification(freelancer, document.getName(), message);
     }
 
-    private void sendNotification(Users user, String documentName, String message) {
-        notificationService.sendNotification(user, documentName, message);
+    private void sendNotification(Freelancer freelancer, String documentName, String message) {
+        notificationService.sendNotification(freelancer, documentName, message);
     }
 
-    private Documents buildDocument(DocumentRequestDto incomingDoc, MultipartFile uploadedFile, Users user) {
+    private Documents buildDocument(DocumentRequestDto incomingDoc, MultipartFile uploadedFile, Freelancer freelancer) {
         String baseNameOfTheFile = FilenameUtils.getBaseName(uploadedFile.getOriginalFilename());
         return Documents.builder()
                 .name(baseNameOfTheFile)
                 .documentType(incomingDoc.getDocumentType())
                 .fileType(uploadedFile.getContentType())
                 .expiryDate(incomingDoc.getExpiryDate())
-                .user(user)
+                .freelancer(freelancer)
                 .verified(true)
                 .build();
     }
 
-    private void updateDocumentFields(Documents document, DocumentRequestDto incomingDoc, MultipartFile uploadedFile, Users user) {
+    private void updateDocumentFields(Documents document, DocumentRequestDto incomingDoc, MultipartFile uploadedFile, Freelancer freelancer) {
         document.setName(FilenameUtils.getBaseName(uploadedFile.getOriginalFilename()));
         document.setDocumentType(incomingDoc.getDocumentType());
         document.setFileType(uploadedFile.getContentType());
         document.setExpiryDate(incomingDoc.getExpiryDate());
-        document.setUser(user);
+        document.setFreelancer(freelancer);
         document.setVerified(true);
     }
 }

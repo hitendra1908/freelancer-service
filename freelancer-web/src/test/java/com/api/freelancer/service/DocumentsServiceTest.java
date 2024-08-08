@@ -4,11 +4,9 @@ import com.api.freelancer.document.DocumentRequestDto;
 import com.api.freelancer.document.DocumentResponseDto;
 import com.api.freelancer.exception.document.DocumentNotFoundException;
 import com.api.freelancer.exception.document.DuplicateDocumentException;
-import com.api.freelancer.exception.user.UserNotFoundException;
 import com.api.freelancer.model.Documents;
-import com.api.freelancer.model.Users;
+import com.api.freelancer.model.Freelancer;
 import com.api.freelancer.repository.DocumentsRepository;
-import com.api.freelancer.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +41,7 @@ class DocumentsServiceTest {
     private DocumentsRepository documentsRepository;
 
     @Mock
-    private UserService userService;
+    private FreelancerService freelancerService;
 
     @Mock
     private NotificationService notificationService;
@@ -53,7 +51,7 @@ class DocumentsServiceTest {
 
     private DocumentRequestDto documentRequestDto;
     private MockMultipartFile multipartFile;
-    private Users user;
+    private Freelancer freelancer;
     private Documents document;
 
 
@@ -68,14 +66,14 @@ class DocumentsServiceTest {
                 .expiryDate(LocalDate.now().plusMonths(3))
                 .build();
 
-        user = new Users();
-        user.setUserName("testUser");
+        freelancer = new Freelancer();
+        freelancer.setUserName("testUser");
 
         document = Documents.builder()
                 .id(1L)
                 .name("testUser_document")
                 .documentType("testDocType")
-                .user(user)
+                .freelancer(freelancer)
                 .fileType("application/pdf")
                 .expiryDate(LocalDate.now().plusMonths(3))
                 .verified(true)
@@ -86,7 +84,7 @@ class DocumentsServiceTest {
     void shouldSuccessfullyCreateDocument() {
         final String expectedMessage = "Document: testUser_document for user: testUser is successfully uploaded and verified.";
 
-        when(userService.findUserByUserName("testUser")).thenReturn(user);
+        when(freelancerService.findUserByUserName("testUser")).thenReturn(freelancer);
         when(documentsRepository.save(any(Documents.class))).thenReturn(document);
 
         DocumentResponseDto responseDto = documentsService.createDocument(documentRequestDto, multipartFile);
@@ -99,12 +97,12 @@ class DocumentsServiceTest {
         assertEquals("application/pdf", responseDto.getFileType());
         assertEquals(LocalDate.now().plusMonths(3), responseDto.getExpiryDate());
         assertTrue(responseDto.isVerified());
-        verify(notificationService, times(1)).sendNotification(user, document.getName(), expectedMessage);
+        verify(notificationService, times(1)).sendNotification(freelancer, document.getName(), expectedMessage);
     }
 
     @Test
     void should_ThrowDuplicateDocumentException_WhenUploadingSameDocument() {
-        when(userService.findUserByUserName("testUser")).thenReturn(user);
+        when(freelancerService.findUserByUserName("testUser")).thenReturn(freelancer);
         when(documentsRepository.save(any(Documents.class))).thenThrow(DataIntegrityViolationException.class);
 
         DuplicateDocumentException exception = assertThrows(DuplicateDocumentException.class, () -> documentsService.createDocument(documentRequestDto, multipartFile));
@@ -124,7 +122,7 @@ class DocumentsServiceTest {
                 .expiryDate(LocalDate.now().plusMonths(3))
                 .build();
 
-        when(userService.findUserByUserName("testUser")).thenReturn(user);
+        when(freelancerService.findUserByUserName("testUser")).thenReturn(freelancer);
         when(documentsRepository.findById(1L)).thenReturn(Optional.of(document));
         when(documentsRepository.save(any(Documents.class))).thenReturn(document);
 
@@ -133,12 +131,12 @@ class DocumentsServiceTest {
         assertEquals("updatedDocType", response.getDocumentType());
 
         verify(notificationService, times(1))
-                .sendNotification(user, document.getName(), expectedMessage);
+                .sendNotification(freelancer, document.getName(), expectedMessage);
     }
 
     @Test
     void updateDocument_DocumentNotFound() {
-        when(userService.findUserByUserName("testUser")).thenReturn(user);
+        when(freelancerService.findUserByUserName("testUser")).thenReturn(freelancer);
         when(documentsRepository.findById(1L)).thenReturn(Optional.empty());
 
         DocumentNotFoundException exception = assertThrows(DocumentNotFoundException.class, () ->
@@ -177,7 +175,7 @@ class DocumentsServiceTest {
 
         verify(documentsRepository).delete(documentCaptor.capture());
         assertEquals(document, documentCaptor.getValue());
-        verify(notificationService, times(1)).sendNotification(user, document.getName(), expectedMessage);
+        verify(notificationService, times(1)).sendNotification(freelancer, document.getName(), expectedMessage);
     }
 
     @Test

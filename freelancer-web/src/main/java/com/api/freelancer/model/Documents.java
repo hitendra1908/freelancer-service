@@ -41,11 +41,6 @@ public class Documents {
     @NotBlank
     private String fileType;
 
-    //TODO check why its not working for findByUserName
-/*    @NotBlank
-    @Lob
-    private byte[] content;*/
-
     @NotBlank
     private LocalDate expiryDate;
 
@@ -54,5 +49,5 @@ public class Documents {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private Users user;
+    private Freelancer freelancer;
 }

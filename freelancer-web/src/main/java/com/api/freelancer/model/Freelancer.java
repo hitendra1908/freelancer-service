@@ -24,7 +24,7 @@ import java.util.List;
 @Getter
 @Data
 @Entity
-public class Users {
+public class Freelancer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,6 +1,6 @@
 package com.api.freelancer;
 
-import com.api.freelancer.user.UserResponseDto;
+import com.api.freelancer.freelancer.FreelancerResponseDto;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -11,7 +11,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 
 
-public class UsersIntegrationTest extends AbstractIntegrationTest{
+public class FreelancerIntegrationTest extends AbstractIntegrationTest{
 
     @Container
     @ServiceConnection
@@ -22,7 +22,7 @@ public class UsersIntegrationTest extends AbstractIntegrationTest{
     @Test
     void testSaveUser() {
 
-        UserResponseDto user1 = UserResponseDto.builder()
+        FreelancerResponseDto user1 = FreelancerResponseDto.builder()
                 .id(1L)
                 .userName("testUser")
                 .firstName("Tony")
@@ -35,7 +35,7 @@ public class UsersIntegrationTest extends AbstractIntegrationTest{
                 .contentType(ContentType.JSON)
                 .body(user1)
         .when()
-                .post("/users")
+                .post()
         .then()
                 .statusCode(200)
                 .body(containsString("testUser"), containsString("Tony"));

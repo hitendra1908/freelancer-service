@@ -2,8 +2,8 @@ package com.api.freelancer.service;
 
 import com.api.freelancer.kafka.KafkaProducer;
 import com.api.freelancer.model.Documents;
+import com.api.freelancer.model.Freelancer;
 import com.api.freelancer.model.Notification;
-import com.api.freelancer.model.Users;
 import com.api.freelancer.repository.NotificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,12 +33,12 @@ class NotificationServiceTest {
     @InjectMocks
     private NotificationService notificationService;
 
-    private Users validUser;
+    private Freelancer validFreelancer;
     private Documents validDocument;
 
     @BeforeEach
     void setUp() {
-        validUser = Users.builder()
+        validFreelancer = Freelancer.builder()
                 .userName("ironMan")
                 .firstName("Tony")
                 .lastName("Stark")
@@ -48,7 +48,7 @@ class NotificationServiceTest {
                 .id(1L)
                 .name("testUser_document.pdf")
                 .documentType("testDocType")
-                .user(validUser)
+                .freelancer(validFreelancer)
                 .fileType("application/pdf")
                 .expiryDate(LocalDate.now().plusMonths(3))
                 .verified(true)
@@ -58,13 +58,13 @@ class NotificationServiceTest {
     @Test
     void testSendNotification() {
         String message = "Document : testUser_document.pdf for user: ironMan successfully uploaded and verified.";
-        notificationService.sendNotification(validUser, validDocument.getName(), message);
+        notificationService.sendNotification(validFreelancer, validDocument.getName(), message);
 
         ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
         verify(notificationRepository, times(1)).save(notificationCaptor.capture());
         Notification savedNotification = notificationCaptor.getValue();
 
-        assertEquals(validUser, savedNotification.getReceiver());
+        assertEquals(validFreelancer, savedNotification.getReceiver());
         assertEquals(validDocument.getName(), savedNotification.getDocumentName());
         assertEquals(LocalDateTime.now().getDayOfMonth(), savedNotification.getTimestamp().getDayOfMonth());
 

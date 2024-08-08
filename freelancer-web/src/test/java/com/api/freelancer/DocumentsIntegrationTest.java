@@ -1,7 +1,7 @@
 package com.api.freelancer;
 
-import com.api.freelancer.model.Users;
-import com.api.freelancer.repository.UserRepository;
+import com.api.freelancer.model.Freelancer;
+import com.api.freelancer.repository.FreelancerRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.containsString;
 public class DocumentsIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
-    UserRepository userRepository;
+    FreelancerRepository freelancerRepository;
 
     @Container
     @ServiceConnection
@@ -41,14 +41,14 @@ public class DocumentsIntegrationTest extends AbstractIntegrationTest {
     @Test
     void testSaveDocument() {
         //creating a user before uploading document for that user
-        userRepository.deleteAll();
-        Users validUser = Users.builder()
+        freelancerRepository.deleteAll();
+        Freelancer validFreelancer = Freelancer.builder()
                 .userName("testUser")
                 .firstName("Tony")
                 .lastName("Stark")
                 .email("tony.stark@example.com")
                 .build();
-        userRepository.save(validUser);
+        freelancerRepository.save(validFreelancer);
 
         File json = new File("src/test/resources/documentRequest.json");
 

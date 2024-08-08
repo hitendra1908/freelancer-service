@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface DocumentsRepository extends JpaRepository<Documents, Long> {
 
-    List<Documents> findByUserUserName(String userName);
+    List<Documents> findByFreelancerUserName(String userName);
 }
