@@ -1,17 +1,18 @@
 # FreelancerService
 
-FreelancerService is an API that allows freelancers to register and upload their documents for verification. Notifications are sent to freelancers for every document manipulation (create, update, delete).
+FreelancerService is an API that allows freelancers to register and upload their documents for verification. Notifications are sent to Kafka topic for every document manipulation (create, update, delete).
 
 ## Technologies Used
 This project utilizes the following technologies:
 * Spring Boot 3.3.2
 * Spring Data JPA
 * PostgreSQL 14
-* Maven
+* Maven 3.3.2
 * Java 21
 * JUnit 5
 * Docker
 * Kafka (for message delivery)
+* Kafka ui
 * [REST Assured](https://rest-assured.io/) and [Testcontainers](https://testcontainers.com/) (for Spring integration tests using a container)
 
 ## Project Structure
@@ -43,10 +44,13 @@ This module implements the APIs defined in the freelancer-api module and exposes
    ```sh
    mvn spring-boot:run
 
-## Viewing Swagger Documentation
-The Swagger files (in JSON and YAML formats) can be found in the freelancer-api/target/swagger directory. You can upload these files to Swagger Editor to view the documentation.
+## To View Kafka Messages
+Kafka messages can be seen in the kafka-ui at http://localhost:8090/
 
 ## How to upload document via postman
-To upload a document for a freelancer, use the POST /api/freelancer/documents endpoint. The request requires a JSON body and a file, as shown in the image below:
+To upload a document for a freelancer, use the POST /api/freelancers/documents endpoint. The request requires a JSON body and a file, as shown in the image below:
 
 ![img.png](img.png)
+
+## Viewing Swagger Documentation
+The Swagger files (in JSON and YAML formats) can be found in the freelancer-api/target/swagger directory. You can paste these files to Swagger Editor (https://editor-next.swagger.io/) to view the documentation.

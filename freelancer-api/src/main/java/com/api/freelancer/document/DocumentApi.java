@@ -17,7 +17,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/api/freelancer")
+@Path("/api/freelancers")
 public interface DocumentApi {
 
     @POST
@@ -25,7 +25,7 @@ public interface DocumentApi {
     @Consumes({MediaType.MULTIPART_FORM_DATA} )
     @Produces({MediaType.APPLICATION_JSON})
     @ApiOperation(value = "Upload a file with JSON data",
-            notes = "This endpoint allows you to upload a file along with some JSON data",
+            notes = "This endpoint allows you to upload a file in pdf and jpeg format along with some JSON data",
             response = DocumentResponseDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successfully uploaded a Document"),
@@ -77,7 +77,7 @@ public interface DocumentApi {
 
     @DELETE
     @Path("/documents/{id}")
-    @ApiOperation(value = "Delete a document by id", response = DocumentResponseDto.class)
+    @ApiOperation(value = "Delete a document by id")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Successfully deleted a Document"),
             @ApiResponse(code = 404, message = "Document not found"),

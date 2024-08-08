@@ -53,13 +53,13 @@
                             <locations>
                                 <location>com.api.freelancer</location>
                             </locations>
-                            <schemes>https</schemes>
+                            <schemes>http</schemes>
                             <host>localhost:8080</host>
                             <basePath>/</basePath>
                             <info>
                                 <title>Freelancer API</title>
                                 <version>1.0.0</version>
-                                <description>FreelancerAPI provides endpoints to register a freelancer and upload his/her documents.</description>
+                                <description>FreelancerAPI provides endpoints to register a freelancer and upload their documents.</description>
                             </info>
                             <outputFormats>yaml,json</outputFormats>
                             <swaggerDirectory>${project.build.directory}/swagger</swaggerDirectory>

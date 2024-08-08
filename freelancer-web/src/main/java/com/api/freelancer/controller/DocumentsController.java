@@ -21,7 +21,7 @@ import javax.ws.rs.core.MediaType;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/freelancer")
+@RequestMapping("/api/freelancers")
 public class DocumentsController implements DocumentApi {
 
     private final DocumentsService documentsService;

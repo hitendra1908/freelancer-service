@@ -17,7 +17,7 @@ public abstract class AbstractIntegrationTest {
 
     @BeforeEach
     public void setUp() {
-        RestAssured.baseURI = "http://localhost:" + port + "/api/freelancer";
+        RestAssured.baseURI = "http://localhost:" + port + "/api/freelancers";
     }
 
 

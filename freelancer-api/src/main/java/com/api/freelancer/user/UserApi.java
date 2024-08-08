@@ -16,7 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-@Path("/api/freelancer")
+@Path("/api/freelancers")
 public interface UserApi {
 
     @GET
