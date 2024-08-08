@@ -21,11 +21,11 @@ public class DocumentValidator {
     public static void validateDocument(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
         validateFile(uploadedFile);
 
-        if (!Objects.requireNonNull(uploadedFile.getOriginalFilename()).startsWith(incomingDoc.userName())) {
+        if (!Objects.requireNonNull(uploadedFile.getOriginalFilename()).startsWith(incomingDoc.getUserName())) {
             log.error("Wrong document name");
             throw new DocumentNameException("Document name must start with the owner's username");
         }
-        if (incomingDoc.expiryDate().isBefore(LocalDate.now().plusMonths(2))) {
+        if (incomingDoc.getExpiryDate().isBefore(LocalDate.now().plusMonths(2))) {
             log.error("Document expiring too soon");
             throw new DocumentExpiryException("Document expiry date must be at least 2 months from now");
         }

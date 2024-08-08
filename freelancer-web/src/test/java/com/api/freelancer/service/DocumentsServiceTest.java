@@ -59,10 +59,18 @@ class DocumentsServiceTest {
 
     @BeforeEach
     void setup() {
-        documentRequestDto = new DocumentRequestDto("testDocType", "testUser", LocalDate.now().plusMonths(3));
-        multipartFile = new MockMultipartFile("file", "testUser_document.pdf", "application/pdf", "test content".getBytes());
+        multipartFile = new MockMultipartFile("file", "testUser_document.pdf",
+                "application/pdf", "test content".getBytes());
+
+        documentRequestDto = DocumentRequestDto.builder()
+                .documentType("testDocType")
+                .userName("testUser")
+                .expiryDate(LocalDate.now().plusMonths(3))
+                .build();
+
         user = new Users();
         user.setUserName("testUser");
+
         document = Documents.builder()
                 .id(1L)
                 .name("testUser_document")
@@ -84,13 +92,13 @@ class DocumentsServiceTest {
         DocumentResponseDto responseDto = documentsService.createDocument(documentRequestDto, multipartFile);
 
         assertNotNull(responseDto);
-        assertEquals(1L, responseDto.id());
-        assertEquals("testUser_document", responseDto.name());
-        assertEquals("testDocType", responseDto.documentType());
-        assertEquals("testUser", responseDto.userName());
-        assertEquals("application/pdf", responseDto.fileType());
-        assertEquals(LocalDate.now().plusMonths(3), responseDto.expiryDate());
-        assertTrue(responseDto.verified());
+        assertEquals(1L, responseDto.getId());
+        assertEquals("testUser_document", responseDto.getName());
+        assertEquals("testDocType", responseDto.getDocumentType());
+        assertEquals("testUser", responseDto.getUserName());
+        assertEquals("application/pdf", responseDto.getFileType());
+        assertEquals(LocalDate.now().plusMonths(3), responseDto.getExpiryDate());
+        assertTrue(responseDto.isVerified());
         verify(notificationService, times(1)).sendNotification(user, document.getName(), expectedMessage);
     }
 
@@ -129,16 +137,25 @@ class DocumentsServiceTest {
 
     @Test
     void shouldUpdateDocument() {
-        final String expectedMessage = "Document: testUser_document for user: testUser is successfully updated and verified.";
-        DocumentRequestDto updatedRequestDto = new DocumentRequestDto("updatedDocType", "testUser", LocalDate.now().plusMonths(3));
+        final String expectedMessage = "Document: testUser_document for user: testUser " +
+                "is successfully updated and verified.";
+
+        DocumentRequestDto updatedRequestDto = DocumentRequestDto.builder()
+                .documentType("updatedDocType")
+                .userName("testUser")
+                .expiryDate(LocalDate.now().plusMonths(3))
+                .build();
+
         when(userRepository.findByUserName("testUser")).thenReturn(Optional.of(user));
         when(documentsRepository.findById(1L)).thenReturn(Optional.of(document));
         when(documentsRepository.save(any(Documents.class))).thenReturn(document);
 
         DocumentResponseDto response = documentsService.updateDocument(1L, updatedRequestDto, multipartFile);
 
-        assertEquals("updatedDocType", response.documentType());
-        verify(notificationService, times(1)).sendNotification(user, document.getName(), expectedMessage);
+        assertEquals("updatedDocType", response.getDocumentType());
+
+        verify(notificationService, times(1))
+                .sendNotification(user, document.getName(), expectedMessage);
     }
 
     @Test
@@ -158,8 +175,8 @@ class DocumentsServiceTest {
 
         DocumentResponseDto response = documentsService.getDocument(1L);
 
-        assertEquals("testUser_document", response.name());
-        assertEquals("testDocType", response.documentType());
+        assertEquals("testUser_document", response.getName());
+        assertEquals("testDocType", response.getDocumentType());
     }
 
 
@@ -194,6 +211,4 @@ class DocumentsServiceTest {
 
         assertEquals("Document you are trying to delete is not found.", exception.getMessage());
     }
-
-
 }

@@ -30,9 +30,9 @@ public class DocumentsService {
     public DocumentResponseDto createDocument(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
         DocumentValidator.validateDocument(incomingDoc, uploadedFile);
 
-        Users user = userRepository.findByUserName(incomingDoc.userName())
+        Users user = userRepository.findByUserName(incomingDoc.getUserName())
                 .orElseThrow(() -> new UserNotFoundException(
-                        "Wrong userName: No user found for the given userName: " + incomingDoc.userName()));
+                        "Wrong userName: No user found for the given userName: " + incomingDoc.getUserName()));
 
         Documents savedDocument = saveDocumentAndSendNotification(incomingDoc, uploadedFile, user);
 
@@ -42,9 +42,9 @@ public class DocumentsService {
     public DocumentResponseDto updateDocument(final Long id, final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
         DocumentValidator.validateDocument(incomingDoc, uploadedFile);
 
-        Users user = userRepository.findByUserName(incomingDoc.userName())
+        Users user = userRepository.findByUserName(incomingDoc.getUserName())
                 .orElseThrow(() -> new UserNotFoundException(
-                        "Wrong userName: No user found for the given userName: " + incomingDoc.userName()));
+                        "Wrong userName: No user found for the given userName: " + incomingDoc.getUserName()));
 
         Documents savedDocument = updateDocumentAndSendNotification(id, incomingDoc, uploadedFile, user);
 
@@ -140,9 +140,9 @@ public class DocumentsService {
         String baseNameOfTheFile = FilenameUtils.getBaseName(uploadedFile.getOriginalFilename());
         return Documents.builder()
                 .name(baseNameOfTheFile)
-                .documentType(incomingDoc.documentType())
+                .documentType(incomingDoc.getDocumentType())
                 .fileType(uploadedFile.getContentType())
-                .expiryDate(incomingDoc.expiryDate())
+                .expiryDate(incomingDoc.getExpiryDate())
                 .user(user)
                 .verified(true)
                 .build();
@@ -150,9 +150,9 @@ public class DocumentsService {
 
     private void updateDocumentFields(Documents document, DocumentRequestDto incomingDoc, MultipartFile uploadedFile, Users user) {
         document.setName(FilenameUtils.getBaseName(uploadedFile.getOriginalFilename()));
-        document.setDocumentType(incomingDoc.documentType());
+        document.setDocumentType(incomingDoc.getDocumentType());
         document.setFileType(uploadedFile.getContentType());
-        document.setExpiryDate(incomingDoc.expiryDate());
+        document.setExpiryDate(incomingDoc.getExpiryDate());
         document.setUser(user);
         document.setVerified(true);
     }

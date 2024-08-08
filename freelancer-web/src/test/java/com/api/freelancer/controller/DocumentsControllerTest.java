@@ -29,29 +29,37 @@ class DocumentsControllerTest {
     @InjectMocks
     private DocumentsController documentsController;
 
-    private DocumentRequestDto documentRequestDto;
+    @Mock
     private MockMultipartFile multipartFile;
+
+    private DocumentRequestDto documentRequestDto;
     private DocumentResponseDto documentResponseDto;
 
     @BeforeEach
     void setup() {
-        documentRequestDto = new DocumentRequestDto( "testDocType", "testUser", LocalDate.now().plusMonths(3));
-        multipartFile = new MockMultipartFile("file", "testUser_document.pdf", "application/pdf", "test content".getBytes());
-        documentResponseDto = new DocumentResponseDto(1L,
-                "testUser_document.pdf",
-                "testDocType",
-                "testUser",
-                "application/pdf",
-                LocalDate.now().plusMonths(3),
-                true
-        );
+        documentRequestDto = DocumentRequestDto.builder()
+                .documentType("testDocType")
+                .userName("testUser")
+                .expiryDate(LocalDate.now().plusMonths(3))
+                .build();
+
+        documentResponseDto = DocumentResponseDto.builder()
+                .id(1L)
+                .userName("testUser")
+                .name("testUser_document")
+                .documentType("testDocType")
+                .fileType("application/pdf")
+                .expiryDate(LocalDate.now().plusMonths(3))
+                .verified(true)
+                .build();
     }
 
     @Test
     void shouldCreateDocument() {
         when(documentsService.createDocument(documentRequestDto, multipartFile)).thenReturn(documentResponseDto);
 
-        ResponseEntity<DocumentResponseDto> response = documentsController.uploadDocument(documentRequestDto, multipartFile);
+        ResponseEntity<DocumentResponseDto> response = documentsController.uploadDocument(documentRequestDto,
+                multipartFile);
 
         assertEquals(ResponseEntity.ok(documentResponseDto), response);
         verify(documentsService, times(1)).createDocument(documentRequestDto, multipartFile);
@@ -67,7 +75,8 @@ class DocumentsControllerTest {
                 documentsController.updateDocument(1L, documentRequestDto, multipartFile);
 
         assertEquals(ResponseEntity.ok(documentResponseDto), response);
-        verify(documentsService, times(1)).updateDocument(1L, documentRequestDto, multipartFile);
+        verify(documentsService, times(1))
+                .updateDocument(1L, documentRequestDto, multipartFile);
     }
 
     @Test
@@ -92,6 +101,4 @@ class DocumentsControllerTest {
         assertEquals(ResponseEntity.noContent().build(), response);
         verify(documentsService, times(1)).deleteDocument(id);
     }
-
-
 }

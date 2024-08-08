@@ -22,7 +22,14 @@ public class UsersIntegrationTest extends AbstractIntegrationTest{
     @Test
     void testSaveUser() {
 
-        UserResponseDto user1 = new UserResponseDto(1L, "testUser", "Tony", "Stark", "tony.stark@example.com", null);
+        UserResponseDto user1 = UserResponseDto.builder()
+                .id(1L)
+                .userName("testUser")
+                .firstName("Tony")
+                .lastName("Stark")
+                .email("tony.stark@example.com")
+                .documents(null)
+                .build();
 
         given()
                 .contentType(ContentType.JSON)
@@ -32,6 +39,5 @@ public class UsersIntegrationTest extends AbstractIntegrationTest{
         .then()
                 .statusCode(200)
                 .body(containsString("testUser"), containsString("Tony"));
-
     }
 }

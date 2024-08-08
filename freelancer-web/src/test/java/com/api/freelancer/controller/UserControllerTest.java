@@ -34,10 +34,28 @@ public class UserControllerTest {
 
     @BeforeEach
     void setup() {
-        userRequestDto = new UserRequestDto("ironMan", "Tony", "Stark", "tony.stark@example.com");
-        user1 = new UserResponseDto(1L,"ironMan", "Tony", "Stark", "tony.stark@example.com", null);
-        user2 = new UserResponseDto(2L, "batman", "Bruce", "Wayne", "bruce.wayne@example.com", null);
-
+        userRequestDto = UserRequestDto.builder()
+                .userName("ironMan")
+                .firstName("Tony")
+                .lastName("Stark")
+                .email("tony.stark@example.com")
+                .build();
+        user1 = UserResponseDto.builder()
+                .id(1L)
+                .userName("ironMan")
+                .firstName("Tony")
+                .lastName("Stark")
+                .email("tony.stark@example.com")
+                .documents(null)
+                .build();
+        user1 = UserResponseDto.builder()
+                .id(2L)
+                .userName("batman")
+                .firstName("Bruce")
+                .lastName("Wayne")
+                .email("bruce.wayne@example.com")
+                .documents(null)
+                .build();
     }
 
     @Test

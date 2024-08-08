@@ -22,32 +22,36 @@ public interface DocumentApi {
 
     @POST
     @Path("/documents")
-    @Consumes({MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.MULTIPART_FORM_DATA} )
     @Produces({MediaType.APPLICATION_JSON})
-    @ApiOperation(value = "Add a document", response = DocumentResponseDto.class)
+    @ApiOperation(value = "Upload a file with JSON data",
+            notes = "This endpoint allows you to upload a file along with some JSON data",
+            response = DocumentResponseDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successfully uploaded a Document"),
             @ApiResponse(code = 400, message = "Bad Request"),
             @ApiResponse(code = 409, message = "Conflict: Document already exists "),
-            @ApiResponse(code = 413, message = "File is too large"),
+            @ApiResponse(code = 413, message = "Uploaded file is too large: maximus size allowed is 5MB"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     ResponseEntity<DocumentResponseDto> uploadDocument(@ApiParam(name = "Document details",
-                                                                 value = "Document details",
-                                                                 required = true) DocumentRequestDto documentRequest,
+                                                                value = "Document details",
+                                                                required = true) DocumentRequestDto documentRequest,
                                                        @ApiParam(name = "Document to upload",
-                                                                 value = "Document to upload",
-                                                                 required = true) MultipartFile file);
+                                                               value = "Document to upload",
+                                                               required = true) MultipartFile file);
 
     @PUT
     @Path("/documents/{id}")
-    @Consumes({MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.MULTIPART_FORM_DATA})
     @Produces({MediaType.APPLICATION_JSON})
-    @ApiOperation(value = "Update a document", response = DocumentResponseDto.class)
+    @ApiOperation(value = "Upload a updated file with JSON data",
+            notes = "This endpoint allows you to upload a file along with some JSON data",
+            response = DocumentResponseDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successfully updated a Document"),
             @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 413, message = "File is too large"),
+            @ApiResponse(code = 413, message = "Uploaded file is too large: maximus size allowed is 5MB"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     ResponseEntity<DocumentResponseDto> updateDocument(@PathParam("id") @ApiParam("id of the user") Long id,

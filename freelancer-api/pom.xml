@@ -55,7 +55,7 @@
                             </locations>
                             <schemes>https</schemes>
                             <host>localhost:8080</host>
-                            <basePath>/api</basePath>
+                            <basePath>/</basePath>
                             <info>
                                 <title>Freelancer API</title>
                                 <version>1.0.0</version>

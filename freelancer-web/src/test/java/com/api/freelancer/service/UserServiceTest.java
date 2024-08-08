@@ -49,7 +49,12 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        validUserRequestDto = new UserRequestDto("ironMan", "Tony", "Stark", "tony.stark@example.com");
+        validUserRequestDto = UserRequestDto.builder()
+                .userName("ironMan")
+                .firstName("Tony")
+                .lastName("Stark")
+                .email("tony.stark@example.com")
+                .build();
         validUser = Users.builder()
                 .userName("ironMan")
                 .firstName("Tony")
@@ -77,7 +82,7 @@ public class UserServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("ironMan", result.get(0).userName());
+        assertEquals("ironMan", result.get(0).getUserName());
     }
 
     @Test
@@ -88,12 +93,17 @@ public class UserServiceTest {
         UserResponseDto result = userService.save(validUserRequestDto);
 
         assertNotNull(result);
-        assertEquals("ironMan", result.userName());
+        assertEquals("ironMan", result.getUserName());
     }
 
     @Test
     void save_ShouldThrowDuplicateUserException_WhenSameUserName() {
-        UserRequestDto userRequestDto = new UserRequestDto("john_doe", "John", "Doe", "john@example.com");
+        UserRequestDto userRequestDto = UserRequestDto.builder()
+                .userName("john_doe")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@example.com")
+                .build();
         when(userRepository.save(any(Users.class))).thenThrow(DataIntegrityViolationException.class);
 
         DuplicateUserException exception = assertThrows(DuplicateUserException.class, () -> userService.save(userRequestDto));
@@ -103,7 +113,12 @@ public class UserServiceTest {
 
     @Test
     void update_ShouldUpdateUser() {
-        UserRequestDto userRequestDto = new UserRequestDto("john_doe", "John", "Doe", "john@example.com");
+        UserRequestDto userRequestDto = UserRequestDto.builder()
+                .userName("john_doe")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@example.com")
+                .build();
         Users existingUser = Users.builder()
                 .id(1L)
                 .userName("john_doe")
@@ -116,15 +131,18 @@ public class UserServiceTest {
 
         UserResponseDto responseDto = userService.updateUser(1L, userRequestDto);
         assertNotNull(responseDto);
-        assertEquals("john_doe", responseDto.userName());
-        assertEquals("John", responseDto.firstName());
+        assertEquals("john_doe", responseDto.getUserName());
+        assertEquals("John", responseDto.getFirstName());
     }
-
-
 
     @Test
     void update_ShouldThrowUserNameException_WhenUpdatingUserName() {
-        UserRequestDto userRequestDto = new UserRequestDto("jane_doe", "Jane", "Doe", "jane@example.com");
+        UserRequestDto userRequestDto = UserRequestDto.builder()
+                .userName("jane_doe")
+                .firstName("Jane")
+                .lastName("Doe")
+                .email("jane@example.com")
+                .build();
         Users existingUser = Users.builder()
                 .id(1L)
                 .userName("john_doe")
@@ -153,8 +171,8 @@ public class UserServiceTest {
 
         UserResponseDto responseDto = userService.findUserById(1L);
         assertNotNull(responseDto);
-        assertEquals("john_doe", responseDto.userName());
-        assertTrue(responseDto.documents().isEmpty());
+        assertEquals("john_doe", responseDto.getUserName());
+        assertTrue(responseDto.getDocuments().isEmpty());
     }
 
     @Test
@@ -171,8 +189,8 @@ public class UserServiceTest {
 
         UserResponseDto responseDto = userService.findUserById(1L);
         assertNotNull(responseDto);
-        assertEquals("john_doe", responseDto.userName());
-        assertEquals(1, responseDto.documents().size());
+        assertEquals("john_doe", responseDto.getUserName());
+        assertEquals(1, responseDto.getDocuments().size());
     }
 
     @Test
@@ -186,7 +204,12 @@ public class UserServiceTest {
 
     @Test
     void update_ShouldThrowUserNotFoundException_WhenIdDoesNotExist() {
-        UserRequestDto userRequestDto = new UserRequestDto("john_doe", "John", "Doe", "john@example.com");
+        UserRequestDto userRequestDto = UserRequestDto.builder()
+                .userName("john_doe")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@example.com")
+                .build();
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.updateUser(1L, userRequestDto));
@@ -196,7 +219,12 @@ public class UserServiceTest {
 
     @Test
     void save_ShouldThrowUserException_WhenUserNameIsTooShort() {
-        UserRequestDto invalidRequest = new UserRequestDto("usr", "Tony", "Stark", "tony.stark@example.com");
+        UserRequestDto invalidRequest = UserRequestDto.builder()
+                .userName("usr")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@example.com")
+                .build();
 
         UserException exception = assertThrows(UserException.class, () -> userService.save(invalidRequest));
 
@@ -205,8 +233,12 @@ public class UserServiceTest {
 
     @Test
     void save_ShouldThrowUserException_WhenFirstNameIsEmpty() {
-        UserRequestDto invalidRequest = new UserRequestDto("ironMan", "", "Stark", "tony.stark@example.com");
-
+        UserRequestDto invalidRequest = UserRequestDto.builder()
+                .userName("ironMan")
+                .firstName("")
+                .lastName("Stark")
+                .email("tony.stark@example.com")
+                .build();
         UserException exception = assertThrows(UserException.class, () -> userService.save(invalidRequest));
 
         assertEquals("First name cannot be empty", exception.getMessage());
@@ -214,7 +246,12 @@ public class UserServiceTest {
 
     @Test
     void save_ShouldThrowUserException_WhenEmailIsInvalid() {
-        UserRequestDto invalidRequest = new UserRequestDto("ironMan", "Tony", "Stark", "tony.stark@");
+        UserRequestDto invalidRequest = UserRequestDto.builder()
+                .userName("ironMan")
+                .firstName("Tony")
+                .lastName("Stark")
+                .email("tony.stark@")
+                .build();
 
         UserException exception = assertThrows(UserException.class, () -> userService.save(invalidRequest));
 

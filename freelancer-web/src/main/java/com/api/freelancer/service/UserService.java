@@ -45,7 +45,7 @@ public class UserService {
             Users savedUser = userRepository.save(user);
             return produceUserResponseDto(savedUser);
         } catch (DataIntegrityViolationException exception) {
-            throw new DuplicateUserException("User already exists with username: "+ userRequestDto.userName());
+            throw new DuplicateUserException("User already exists with username: "+ userRequestDto.getUserName());
         }
     }
 
@@ -55,13 +55,13 @@ public class UserService {
         Users userToUpdate = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User you are trying to update is not found"));
 
-        if (!userToUpdate.getUserName().equals(userRequestDto.userName())) {
+        if (!userToUpdate.getUserName().equals(userRequestDto.getUserName())) {
             throw new UserNameException("Changing username is not allowed");
         }
 
-        userToUpdate.setFirstName(userRequestDto.firstName());
-        userToUpdate.setLastName(userRequestDto.lastName());
-        userToUpdate.setEmail(userRequestDto.email());
+        userToUpdate.setFirstName(userRequestDto.getFirstName());
+        userToUpdate.setLastName(userRequestDto.getLastName());
+        userToUpdate.setEmail(userRequestDto.getEmail());
 
         return produceUserResponseDto(userRepository.save(userToUpdate));
     }
@@ -102,23 +102,23 @@ public class UserService {
 
     private Users mapToUsers(UserRequestDto userRequestDto) {
         return Users.builder()
-                .userName(userRequestDto.userName())
-                .firstName(userRequestDto.firstName())
-                .lastName(userRequestDto.lastName())
-                .email(userRequestDto.email())
+                .userName(userRequestDto.getUserName())
+                .firstName(userRequestDto.getFirstName())
+                .lastName(userRequestDto.getLastName())
+                .email(userRequestDto.getEmail())
                 .build();
     }
 
     private void validateIncomingUser(UserRequestDto userRequestDto) {
-        if (userRequestDto.userName() == null || userRequestDto.userName().length() < 4) {
+        if (userRequestDto.getUserName() == null || userRequestDto.getUserName().length() < 4) {
             log.error("error occurred while validating username");
             throw new UserException("username should be at least 4 characters");
         }
-        if (userRequestDto.firstName() == null || userRequestDto.firstName().isEmpty()) {
+        if (userRequestDto.getFirstName() == null || userRequestDto.getFirstName().isEmpty()) {
             log.error("error occurred while validating user first name");
             throw new UserException("First name cannot be empty");
         }
-        if (!EMAIL_REGEX_PATTERN.matcher(userRequestDto.email()).matches()) {
+        if (!EMAIL_REGEX_PATTERN.matcher(userRequestDto.getEmail()).matches()) {
             log.error("error occurred while validating user's email address");
             throw new UserException("Invalid email address");
         }
