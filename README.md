@@ -6,12 +6,13 @@ For every manipulation(create/update/delete) to document, a notification is sent
 ## Technologies used:
 Technologies used:
 * Spring Boot 3.3.2
-* Spring Data JPA (Hibernate 6  is the default JPA implementation)
-* PostgreSQL 15
+* Spring Data JPA
+* PostgreSQL 14
 * Maven
 * Java 17
 * JUnit 5
 * Docker
+* Kafka to send message
 * [REST Assured](https://rest-assured.io/) and [Testcontainers](https://testcontainers.com/) (for Spring integration tests using a container)
 
 ## Project structure
