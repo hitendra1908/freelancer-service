@@ -17,7 +17,7 @@ import java.io.File;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 
-public class DocumentsIntegrationTest extends AbstractIntegrationTest{
+public class DocumentsIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     UserRepository userRepository;

@@ -43,7 +43,7 @@ class DocumentsServiceTest {
     private DocumentsRepository documentsRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Mock
     private NotificationService notificationService;
@@ -86,7 +86,7 @@ class DocumentsServiceTest {
     void shouldSuccessfullyCreateDocument() {
         final String expectedMessage = "Document: testUser_document for user: testUser is successfully uploaded and verified.";
 
-        when(userRepository.findByUserName("testUser")).thenReturn(Optional.of(user));
+        when(userService.findUserByUserName("testUser")).thenReturn(user);
         when(documentsRepository.save(any(Documents.class))).thenReturn(document);
 
         DocumentResponseDto responseDto = documentsService.createDocument(documentRequestDto, multipartFile);
@@ -104,34 +104,12 @@ class DocumentsServiceTest {
 
     @Test
     void should_ThrowDuplicateDocumentException_WhenUploadingSameDocument() {
-        when(userRepository.findByUserName("testUser")).thenReturn(Optional.of(user));
+        when(userService.findUserByUserName("testUser")).thenReturn(user);
         when(documentsRepository.save(any(Documents.class))).thenThrow(DataIntegrityViolationException.class);
 
         DuplicateDocumentException exception = assertThrows(DuplicateDocumentException.class, () -> documentsService.createDocument(documentRequestDto, multipartFile));
 
         assertEquals("Document with name: testUser_document already exists", exception.getMessage());
-        verifyNoInteractions(notificationService);
-    }
-
-    @Test
-    void shouldThrowUserNotFoundExceptionWhileCreatingADocument_whenEmptyUser() {
-        when(userRepository.findByUserName("testUser")).thenReturn(Optional.empty());
-
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> documentsService.createDocument(documentRequestDto, multipartFile));
-
-        assertEquals("Wrong userName: No user found for the given userName: testUser", exception.getMessage());
-        verifyNoInteractions(documentsRepository);
-        verifyNoInteractions(notificationService);
-    }
-
-    @Test
-    void shouldThrowUserNotFoundExceptionWhileUpdatingADocument_whenEmptyUser() {
-        when(userRepository.findByUserName("testUser")).thenReturn(Optional.empty());
-
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> documentsService.updateDocument(1L, documentRequestDto, multipartFile));
-
-        assertEquals("Wrong userName: No user found for the given userName: testUser", exception.getMessage());
-        verifyNoInteractions(documentsRepository);
         verifyNoInteractions(notificationService);
     }
 
@@ -146,7 +124,7 @@ class DocumentsServiceTest {
                 .expiryDate(LocalDate.now().plusMonths(3))
                 .build();
 
-        when(userRepository.findByUserName("testUser")).thenReturn(Optional.of(user));
+        when(userService.findUserByUserName("testUser")).thenReturn(user);
         when(documentsRepository.findById(1L)).thenReturn(Optional.of(document));
         when(documentsRepository.save(any(Documents.class))).thenReturn(document);
 
@@ -160,7 +138,7 @@ class DocumentsServiceTest {
 
     @Test
     void updateDocument_DocumentNotFound() {
-        when(userRepository.findByUserName("testUser")).thenReturn(Optional.of(user));
+        when(userService.findUserByUserName("testUser")).thenReturn(user);
         when(documentsRepository.findById(1L)).thenReturn(Optional.empty());
 
         DocumentNotFoundException exception = assertThrows(DocumentNotFoundException.class, () ->

@@ -73,6 +73,12 @@ public class UserService {
         return produceUserResponseDto(user);
     }
 
+    public Users findUserByUserName (final String userName) {
+        return userRepository.findByUserName(userName)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Wrong userName: No user found for the given userName: " + userName));
+    }
+
     private UserResponseDto produceUserResponseDto(Users user) {
         List<DocumentResponseDto> documentResponseDtoList = documentsRepository.findByUserUserName(user.getUserName()).stream()
                 .map(this::mapToDocumentResponseDto)

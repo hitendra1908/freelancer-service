@@ -4,11 +4,9 @@ import com.api.freelancer.document.DocumentRequestDto;
 import com.api.freelancer.document.DocumentResponseDto;
 import com.api.freelancer.exception.document.DocumentNotFoundException;
 import com.api.freelancer.exception.document.DuplicateDocumentException;
-import com.api.freelancer.exception.user.UserNotFoundException;
 import com.api.freelancer.model.Documents;
 import com.api.freelancer.model.Users;
 import com.api.freelancer.repository.DocumentsRepository;
-import com.api.freelancer.repository.UserRepository;
 import com.api.freelancer.validator.DocumentValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,15 +22,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class DocumentsService {
 
     private final DocumentsRepository documentsRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final NotificationService notificationService;
 
     public DocumentResponseDto createDocument(final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
         DocumentValidator.validateDocument(incomingDoc, uploadedFile);
 
-        Users user = userRepository.findByUserName(incomingDoc.getUserName())
-                .orElseThrow(() -> new UserNotFoundException(
-                        "Wrong userName: No user found for the given userName: " + incomingDoc.getUserName()));
+        Users user = userService.findUserByUserName(incomingDoc.getUserName());
 
         Documents savedDocument = saveDocumentAndSendNotification(incomingDoc, uploadedFile, user);
 
@@ -42,9 +38,7 @@ public class DocumentsService {
     public DocumentResponseDto updateDocument(final Long id, final DocumentRequestDto incomingDoc, final MultipartFile uploadedFile) {
         DocumentValidator.validateDocument(incomingDoc, uploadedFile);
 
-        Users user = userRepository.findByUserName(incomingDoc.getUserName())
-                .orElseThrow(() -> new UserNotFoundException(
-                        "Wrong userName: No user found for the given userName: " + incomingDoc.getUserName()));
+        Users user = userService.findUserByUserName(incomingDoc.getUserName());
 
         Documents savedDocument = updateDocumentAndSendNotification(id, incomingDoc, uploadedFile, user);
 
@@ -52,20 +46,22 @@ public class DocumentsService {
     }
 
     public DocumentResponseDto getDocument(final Long id) {
-        Documents document = documentsRepository.findById(id)
-                .orElseThrow(() -> new DocumentNotFoundException("Document you are trying to find is not found."));
+        Documents document = getDocumentById(id, "Document you are trying to find is not found.");
 
         log.debug("Document found with id {}", id);
         return getDocumentResponseDto(document);
     }
 
     public void deleteDocument(final Long id) {
-        Documents document = documentsRepository.findById(id)
-                .orElseThrow(() -> new DocumentNotFoundException("Document you are trying to delete is not found."));
-
+        Documents document = getDocumentById(id, "Document you are trying to delete is not found.");
         documentsRepository.delete(document);
         log.debug("{} deleted from the db", document.getName());
         sendDeleteNotification(document);
+    }
+
+    private Documents getDocumentById(Long id, String errMsg) {
+        return documentsRepository.findById(id)
+                .orElseThrow(() -> new DocumentNotFoundException(errMsg));
     }
 
     @Transactional
@@ -118,14 +114,14 @@ public class DocumentsService {
                 document.getName(), user.getUserName());
         log.debug("sending notification to {} for successfully uploading and validating {}", user.getUserName(),
                 document.getName());
-        notificationService.sendNotification(user, document.getName(), message);
+        sendNotification(user, document.getName(), message);
     }
 
     private void sendUpdateNotification(Users user, Documents document) {
         String message = String.format("Document: %s for user: %s is successfully updated and verified.",
                 document.getName(), user.getUserName());
         log.debug("sending notification to {} for successfully updating {}", user.getUserName(), document.getName());
-        notificationService.sendNotification(user, document.getName(), message);
+        sendNotification(user, document.getName(), message);
     }
 
     private void sendDeleteNotification(Documents document) {
@@ -133,7 +129,11 @@ public class DocumentsService {
         String message = String.format("Document: %s for user: %s is successfully deleted.",
                 document.getName(), user.getUserName());
         log.debug("sending notification to {} for successfully deleting {}", user.getUserName(), document.getName());
-        notificationService.sendNotification(user, document.getName(), message);
+        sendNotification(user, document.getName(), message);
+    }
+
+    private void sendNotification(Users user, String documentName, String message) {
+        notificationService.sendNotification(user, documentName, message);
     }
 
     private Documents buildDocument(DocumentRequestDto incomingDoc, MultipartFile uploadedFile, Users user) {

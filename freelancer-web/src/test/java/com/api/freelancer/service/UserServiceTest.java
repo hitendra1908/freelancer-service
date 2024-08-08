@@ -29,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -256,5 +258,17 @@ public class UserServiceTest {
         UserException exception = assertThrows(UserException.class, () -> userService.save(invalidRequest));
 
         assertEquals("Invalid email address", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowUserNotFoundException_whenEmptyUser() {
+        final String userName = "testUser";
+        when(userRepository.findByUserName(userName)).thenReturn(Optional.empty());
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.findUserByUserName(userName));
+
+        assertEquals("Wrong userName: No user found for the given userName: testUser", exception.getMessage());
+        verify(userRepository, times(1))
+                .findByUserName(userName);
     }
 }

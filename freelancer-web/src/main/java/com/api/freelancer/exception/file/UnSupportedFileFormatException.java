@@ -1,4 +1,4 @@
-package com.api.freelancer.exception.document;
+package com.api.freelancer.exception.file;
 
 public non-sealed class UnSupportedFileFormatException extends FileException {
 

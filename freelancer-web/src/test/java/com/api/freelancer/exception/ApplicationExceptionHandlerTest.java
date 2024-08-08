@@ -1,13 +1,21 @@
 package com.api.freelancer.exception;
 
-import com.api.freelancer.exception.document.*;
-import com.api.freelancer.exception.user.*;
+import com.api.freelancer.exception.document.DocumentExpiryException;
+import com.api.freelancer.exception.document.DocumentNameException;
+import com.api.freelancer.exception.document.DocumentNotFoundException;
+import com.api.freelancer.exception.document.DuplicateDocumentException;
+import com.api.freelancer.exception.file.FileNotFoundException;
+import com.api.freelancer.exception.file.UnSupportedFileFormatException;
+import com.api.freelancer.exception.user.DuplicateUserException;
+import com.api.freelancer.exception.user.InvalidUserException;
+import com.api.freelancer.exception.user.UserNameException;
+import com.api.freelancer.exception.user.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ApplicationExceptionHandlerTest {
 
@@ -104,14 +112,14 @@ class ApplicationExceptionHandlerTest {
         UserNameException exception = new UserNameException("Username cannot be updated");
         ProblemDetail response = handler.handleUserException(exception);
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        assertEquals("Username cannot be updated", response.getTitle());
+        assertEquals("You cannot updated username", response.getTitle());
         assertEquals("Username cannot be updated", response.getDetail());
     }
 
     @Test
     void handleAllOtherException() {
         Exception exception = new Exception("Generic exception");
-        ProblemDetail response = handler.handleAllOtherException(exception);
+        ProblemDetail response = handler.handleAllOtherExceptions(exception);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
         assertEquals("Something went wrong!", response.getTitle());
         assertEquals("Generic exception", response.getDetail());

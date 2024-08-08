@@ -8,7 +8,7 @@ This project utilizes the following technologies:
 * Spring Data JPA
 * PostgreSQL 14
 * Maven
-* Java 17
+* Java 21
 * JUnit 5
 * Docker
 * Kafka (for message delivery)
