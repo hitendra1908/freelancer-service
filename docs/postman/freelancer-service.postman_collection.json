@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "freelancer-endpoints",
+			"name": "freelancers-endpoints",
 			"item": [
 				{
 					"name": "Get All Freelancers",
