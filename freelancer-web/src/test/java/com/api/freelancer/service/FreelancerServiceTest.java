@@ -1,15 +1,15 @@
 package com.api.freelancer.service;
 
+import com.api.freelancer.entity.Documents;
+import com.api.freelancer.entity.Freelancer;
 import com.api.freelancer.exception.freelancer.DuplicateUserException;
 import com.api.freelancer.exception.freelancer.UserException;
 import com.api.freelancer.exception.freelancer.UserNameException;
 import com.api.freelancer.exception.freelancer.UserNotFoundException;
-import com.api.freelancer.model.Documents;
-import com.api.freelancer.model.Freelancer;
-import com.api.freelancer.repository.DocumentsRepository;
-import com.api.freelancer.repository.FreelancerRepository;
 import com.api.freelancer.freelancer.FreelancerRequestDto;
 import com.api.freelancer.freelancer.FreelancerResponseDto;
+import com.api.freelancer.repository.DocumentsRepository;
+import com.api.freelancer.repository.FreelancerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

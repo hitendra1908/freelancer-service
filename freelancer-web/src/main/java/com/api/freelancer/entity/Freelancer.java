@@ -1,4 +1,4 @@
-package com.api.freelancer.model;
+package com.api.freelancer.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

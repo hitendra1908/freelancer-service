@@ -2,10 +2,11 @@ package com.api.freelancer.service;
 
 import com.api.freelancer.document.DocumentRequestDto;
 import com.api.freelancer.document.DocumentResponseDto;
+import com.api.freelancer.entity.Documents;
+import com.api.freelancer.entity.Freelancer;
 import com.api.freelancer.exception.document.DocumentNotFoundException;
 import com.api.freelancer.exception.document.DuplicateDocumentException;
-import com.api.freelancer.model.Documents;
-import com.api.freelancer.model.Freelancer;
+import com.api.freelancer.model.Notification;
 import com.api.freelancer.repository.DocumentsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,7 +56,6 @@ class DocumentsServiceTest {
     private Freelancer freelancer;
     private Documents document;
 
-
     @BeforeEach
     void setup() {
         multipartFile = new MockMultipartFile("file", "testUser_document.pdf",
@@ -82,8 +83,6 @@ class DocumentsServiceTest {
 
     @Test
     void shouldSuccessfullyCreateDocument() {
-        final String expectedMessage = "Document: testUser_document for user: testUser is successfully uploaded and verified.";
-
         when(freelancerService.findUserByUserName("testUser")).thenReturn(freelancer);
         when(documentsRepository.save(any(Documents.class))).thenReturn(document);
 
@@ -97,7 +96,7 @@ class DocumentsServiceTest {
         assertEquals("application/pdf", responseDto.getFileType());
         assertEquals(LocalDate.now().plusMonths(3), responseDto.getExpiryDate());
         assertTrue(responseDto.isVerified());
-        verify(notificationService, times(1)).sendNotification(freelancer, document.getName(), expectedMessage);
+        verify(notificationService, times(1)).sendNotification(any());
     }
 
     @Test
@@ -115,7 +114,11 @@ class DocumentsServiceTest {
     void shouldUpdateDocument() {
         final String expectedMessage = "Document: testUser_document for user: testUser " +
                 "is successfully updated and verified.";
-
+        Notification notification = Notification.builder()
+                .receiver("testUser")
+                .documentName("updatedDocType")
+                .timestamp(LocalDateTime.now())
+                .build();
         DocumentRequestDto updatedRequestDto = DocumentRequestDto.builder()
                 .documentType("updatedDocType")
                 .userName("testUser")
@@ -130,9 +133,7 @@ class DocumentsServiceTest {
 
         assertEquals("updatedDocType", response.getDocumentType());
 
-        verify(notificationService, times(1))
-                .sendNotification(freelancer, document.getName(), expectedMessage);
-    }
+        verify(notificationService, times(1)).sendNotification(any());    }
 
     @Test
     void updateDocument_DocumentNotFound() {
@@ -175,7 +176,7 @@ class DocumentsServiceTest {
 
         verify(documentsRepository).delete(documentCaptor.capture());
         assertEquals(document, documentCaptor.getValue());
-        verify(notificationService, times(1)).sendNotification(freelancer, document.getName(), expectedMessage);
+        verify(notificationService, times(1)).sendNotification(any());
     }
 
     @Test

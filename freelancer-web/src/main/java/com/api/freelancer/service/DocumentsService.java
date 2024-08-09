@@ -2,10 +2,11 @@ package com.api.freelancer.service;
 
 import com.api.freelancer.document.DocumentRequestDto;
 import com.api.freelancer.document.DocumentResponseDto;
+import com.api.freelancer.entity.Documents;
+import com.api.freelancer.entity.Freelancer;
 import com.api.freelancer.exception.document.DocumentNotFoundException;
 import com.api.freelancer.exception.document.DuplicateDocumentException;
-import com.api.freelancer.model.Documents;
-import com.api.freelancer.model.Freelancer;
+import com.api.freelancer.model.Notification;
 import com.api.freelancer.repository.DocumentsRepository;
 import com.api.freelancer.validator.DocumentValidator;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -133,7 +136,12 @@ public class DocumentsService {
     }
 
     private void sendNotification(Freelancer freelancer, String documentName, String message) {
-        notificationService.sendNotification(freelancer, documentName, message);
+        Notification notification = Notification.builder()
+                .receiver(freelancer.getUserName())
+                .documentName(documentName)
+                .timestamp(LocalDateTime.now())
+                .build();
+        notificationService.sendNotification(notification);
     }
 
     private Documents buildDocument(DocumentRequestDto incomingDoc, MultipartFile uploadedFile, Freelancer freelancer) {

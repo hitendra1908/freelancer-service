@@ -1,6 +1,6 @@
 package com.api.freelancer;
 
-import com.api.freelancer.model.Freelancer;
+import com.api.freelancer.entity.Freelancer;
 import com.api.freelancer.repository.FreelancerRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,5 +1,6 @@
 package com.api.freelancer.kafka;
 
+import com.api.freelancer.model.Notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,9 +13,9 @@ public class KafkaProducer {
 
     private static final String TOPIC = "freelancer_notification";
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, Notification> kafkaTemplate;
 
-    public void sendMessage(String message) {
+    public void sendMessage(Notification message) {
         kafkaTemplate.send(TOPIC, message);
     }
 }

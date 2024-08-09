@@ -1,6 +1,6 @@
 package com.api.freelancer.repository;
 
-import com.api.freelancer.model.Documents;
+import com.api.freelancer.entity.Documents;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
