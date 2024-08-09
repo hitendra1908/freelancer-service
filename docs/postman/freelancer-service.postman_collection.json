@@ -1,0 +1,250 @@
+{
+	"info": {
+		"_postman_id": "48648fca-e03c-4c49-8906-a146f1f5c345",
+		"name": "freelancer-service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "freelancer-endpoints",
+			"item": [
+				{
+					"name": "Get All Freelancers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/freelancers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"freelancers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Freelancer by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/freelancers/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"freelancers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a Freelancer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userName\" : \"userName1\",\n    \"firstName\" : \"testUser\",\n    \"lastName\" : \"lastName\",\n    \"email\" : \"first@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/freelancers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"freelancers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a Freelancer",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userName\" : \"userName1\",\n    \"firstName\" : \"testUser1\",\n    \"lastName\" : \"lastName\",\n    \"email\" : \"first@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/freelancers/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"freelancers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Documents endpoints",
+			"item": [
+				{
+					"name": "upload a Document for freelance",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "request",
+									"value": "{\n    \"userName\" : \"userName1\",\n    \"documentType\" : \"type1\",\n    \"expiryDate\" : \"2024-12-09\"\n}",
+									"contentType": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"contentType": "",
+									"type": "file",
+									"src": "/Users/GW64CU/Documents/userName1-Nel.pdf"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/freelancers/documents",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"freelancers",
+								"documents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a Document for freelance",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "request",
+									"value": "{\n    \"userName\" : \"userName1\",\n    \"documentType\" : \"type1\",\n    \"expiryDate\" : \"2024-12-19\"\n}",
+									"contentType": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"contentType": "",
+									"type": "file",
+									"src": "/Users/GW64CU/Documents/userName1-Nel.pdf"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/freelancers/documents/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"freelancers",
+								"documents",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a Document for by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/freelancers/documents/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"freelancers",
+								"documents",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a Document for by id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/freelancers/documents/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"freelancers",
+								"documents",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

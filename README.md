@@ -47,7 +47,10 @@ This module implements the APIs defined in the freelancer-api module and exposes
 ## To View Kafka Messages
 Kafka messages can be seen in the kafka-ui at http://localhost:8090/
 
-## How to upload document via postman
+## Test Endpoint via Postman
+Postman collection is available at "docs/postman" folder to test endpoint via Postman.
+
+### Example to upload a document via postman
 To upload a document for a freelancer, use the POST /api/freelancers/documents endpoint. The request requires a JSON body and a file, as shown in the image below:
 
 ![img.png](img.png)

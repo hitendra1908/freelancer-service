@@ -5,7 +5,6 @@ import com.api.freelancer.document.DocumentRequestDto;
 import com.api.freelancer.document.DocumentResponseDto;
 import com.api.freelancer.service.DocumentsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
